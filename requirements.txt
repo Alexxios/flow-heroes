@@ -2,5 +2,5 @@ numpy==1.26.4
 opencv-python
 mediapipe
 tensorflow==2.16.1
-ml-dtypes==0.5.1
+ml-dtypes~=0.3.1
 pygame-ce==2.5.5
