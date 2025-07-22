@@ -1,7 +1,9 @@
 import pygame
 from threading import Thread
 
+from constants import FPS
 from core.background import Background
+from core.player import Player
 from core.spell import Spell
 
 
@@ -21,13 +23,12 @@ class Game(Thread):
         screen = pygame.display.set_mode((self.width, self.height))
         clock = pygame.time.Clock()
         self._running = True
-        dt = 0
 
         background = Background()
 
         player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+        player = Player(pos=player_pos)
 
-        frames = 0
         while self._running:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
@@ -42,16 +43,7 @@ class Game(Thread):
             # screen.blit(fireball.animation[frames % 8], dest=player_pos)
 
             background.draw(screen)
-
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
-                player_pos.y -= 300 * dt
-            if keys[pygame.K_s]:
-                player_pos.y += 300 * dt
-            if keys[pygame.K_a]:
-                player_pos.x -= 300 * dt
-            if keys[pygame.K_d]:
-                player_pos.x += 300 * dt
+            player.draw(screen)
 
             # flip() the display to put your work on screen
             pygame.display.flip()
@@ -59,7 +51,7 @@ class Game(Thread):
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
-            dt = clock.tick(60) / 1000
-            frames += 1
+            dt = clock.tick(FPS)
+            player.update(dt)
 
         pygame.quit()

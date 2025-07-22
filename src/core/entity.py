@@ -17,6 +17,9 @@ class DrawableEntity(Entity):
     def __init__(self, name: str = "", pos: Vector2 = Vector2(0, 0)):
         super().__init__(name, pos)
 
+    def update(self, dt: int) -> None:
+        ...
+
     def draw(self, parent: Surface) -> None:
         ...
 
