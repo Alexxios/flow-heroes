@@ -22,4 +22,4 @@ if __name__ == "__main__":
         extract_nested_zips("../assets/craftpix-891169-platformer-game-kit-pixel-art.zip", gamekit_dir)
 
     game = Game("Game", 576 * 2, 324 * 2)
-    game.start()
+    game.run()

@@ -1,5 +1,4 @@
 import pygame
-from threading import Thread
 
 from constants import FPS
 from core.background import Background
@@ -7,34 +6,35 @@ from core.player import Player
 from core.spell import Spell
 
 
-class Game(Thread):
+class Game:
     def __init__(self, title: str, width: int, height: int):
         super().__init__()
+
+        # Setup
         self.title = title
         self.width = width
         self.height = height
         self.scenes = []
-        self._running = False
 
     def run(self):
-        """Основной цикл в отдельном потоке."""
+        """Main game loop."""
         # pygame setup
         pygame.init()
         screen = pygame.display.set_mode((self.width, self.height))
         clock = pygame.time.Clock()
-        self._running = True
+        running = True
 
         background = Background()
 
         player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
         player = Player(pos=player_pos)
 
-        while self._running:
+        while running:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self._running = False
+                    running = False
 
             # fill the screen with a color to wipe away anything from last frame
             screen.fill("purple")
