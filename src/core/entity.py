@@ -1,8 +1,6 @@
 from abc import ABC
 
 from pygame import Vector2, Surface
-import pygame.image
-
 
 class Entity(ABC):
     name: str
@@ -13,6 +11,7 @@ class Entity(ABC):
         self.pos = Vector2(pos)
 
 class DrawableEntity(Entity):
+    _surf: Surface
 
     def __init__(self, name: str = "", pos: Vector2 = Vector2(0, 0)):
         super().__init__(name, pos)

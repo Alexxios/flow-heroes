@@ -1,5 +1,4 @@
 from pygame import Surface
-import pygame.image
 
 from constants import FPS
 
