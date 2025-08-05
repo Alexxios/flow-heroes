@@ -4,3 +4,5 @@ mediapipe
 tensorflow==2.16.1
 ml-dtypes~=0.3.1
 pygame-ce==2.5.5
+
+pytest
