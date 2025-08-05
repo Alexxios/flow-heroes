@@ -4,7 +4,6 @@ import zipfile
 from constants import PROJECT_ROOT
 from core.game import Game
 
-
 def extract_nested_zips(start_zip, target_dir):
     with zipfile.ZipFile(start_zip, 'r') as zip_ref:
         zip_ref.extractall(target_dir)

@@ -5,6 +5,8 @@ from core.background import Background
 from core.player import Player
 from core.spell import Spell
 
+from controls.recogniser import Recogniser, DATA_EVENT
+from entities.spells import SUN_STRIKE
 
 class Game:
     def __init__(self, title: str, width: int, height: int):
@@ -24,10 +26,17 @@ class Game:
         clock = pygame.time.Clock()
         running = True
 
+
+        recogniser = Recogniser(daemon=True)
+        recogniser.start()
+
+
         background = Background()
 
         player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
         player = Player(pos=player_pos)
+
+        entities = set()
 
         while running:
             # poll for events
@@ -35,6 +44,11 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                elif event.type == DATA_EVENT:
+                    # Обрабатываем наше пользовательское событие с данными
+                    last_message = event.message
+                    print(f"Получено новое сообщение: {last_message}")
+                    entities.add(SUN_STRIKE)
 
             # fill the screen with a color to wipe away anything from last frame
             screen.fill("purple")
@@ -45,6 +59,10 @@ class Game:
             background.draw(screen)
             player.draw(screen)
 
+            for entity in entities:
+                entity.draw(screen)
+
+
             # flip() the display to put your work on screen
             pygame.display.flip()
 
@@ -53,5 +71,8 @@ class Game:
             # independent physics.
             dt = clock.tick(FPS)
             player.update(dt)
+
+            for entity in entities:
+                entity.update(dt)
 
         pygame.quit()
