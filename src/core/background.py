@@ -1,11 +1,11 @@
 from pygame import Surface
 from pygame.transform import scale2x
 
-from core.entity import DrawableEntity
+from core.entity import Entity
 from utils.resource_manager import ResourceManager
 
 
-class Background(DrawableEntity):
+class Background(Entity):
     _surf: Surface
 
     def __init__(self):

@@ -1,12 +1,12 @@
 from pygame.transform import scale2x
 
-from core.entity import DrawableEntity
+from core.entity import Entity
 
 from utils.animation import Animation
 from utils.resource_manager import ResourceManager
 
 
-class Spell(DrawableEntity):
+class Spell(Entity):
     _dmg: int
     _animation: Animation
 
@@ -23,3 +23,8 @@ class Spell(DrawableEntity):
 
     def draw(self, parent):
         parent.blit(scale2x(self._surf), self.pos)
+
+class SpellFactory:
+    @staticmethod
+    def create_spell(path, dmg = 10):
+        return Spell(path, dmg)
