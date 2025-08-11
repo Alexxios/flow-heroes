@@ -5,7 +5,7 @@ from core.background import Background
 from core.player import Player
 from core.spell import Spell
 
-from controls.recogniser import Recogniser, DATA_EVENT
+from controls.recognizer import Recognizer, DATA_EVENT
 from entities.spells import SUN_STRIKE
 
 class Game:
@@ -22,13 +22,15 @@ class Game:
         """Main game loop."""
         # pygame setup
         pygame.init()
-        screen = pygame.display.set_mode((self.width, self.height))
+        screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.SCALED)
         clock = pygame.time.Clock()
         running = True
 
 
-        recogniser = Recogniser(daemon=True)
-        recogniser.start()
+        # recogniser = Recogniser(daemon=True)
+        # recogniser.start()
+        recognizer = Recognizer(daemon=True)
+        recognizer.start()
 
 
         background = Background()

@@ -1,6 +1,7 @@
 from abc import ABC
 
 from pygame import Vector2, Surface
+from pygame.sprite import Sprite
 
 from core.fsm import FiniteStateMachine
 

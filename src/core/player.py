@@ -7,6 +7,7 @@ import pygame.key
 from core.entity import LivingEntity
 from utils.animation import Animation
 from utils.resource_manager import ResourceManager
+from constants import GESTURE_EVENT
 
 class Player(LivingEntity):
     _state: str
@@ -37,6 +38,18 @@ class Player(LivingEntity):
             self.pos.x -= 0.3 * dt
         if keys[pygame.K_d]:
             self.pos.x += 0.3 * dt
+
+        for event in pygame.event.get(GESTURE_EVENT):
+            # print(event)
+            if event.gesture == "up":
+                self.pos.y -= 0.3 * dt
+            if event.gesture == "down":
+                self.pos.y += 0.3 * dt
+            if event.gesture == "left":
+                self.pos.x -= 0.3 * dt
+            if event.gesture == "right":
+                self.pos.x += 0.3 * dt
+
 
 
     def draw(self, parent: Surface) -> None:

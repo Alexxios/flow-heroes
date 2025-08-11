@@ -24,3 +24,9 @@ class FiniteStateMachine(ABC, Generic[T]):
 
     def update(self, *args, **kwargs) -> None:
         self.state = self.transitions[self.state](*args, **kwargs)
+
+class SingletonFSM(FiniteStateMachine):
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super().__new__(cls)
+        return cls.instance
