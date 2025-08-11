@@ -1,9 +1,9 @@
 import pygame
+from pygame.sprite import Group
 
 from constants import FPS
 from core.background import Background
 from core.player import Player
-from core.spell import Spell
 
 from controls.recognizer import Recognizer, DATA_EVENT
 from entities.spells import SUN_STRIKE
@@ -27,18 +27,14 @@ class Game:
         running = True
 
 
-        # recogniser = Recogniser(daemon=True)
-        # recogniser.start()
         recognizer = Recognizer(daemon=True)
         recognizer.start()
 
-
+        static_objects = Group()
         background = Background()
+        background.add(static_objects)
 
-        player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-        player = Player(pos=player_pos)
-
-        entities = set()
+        spells = Group()
 
         while running:
             # poll for events
@@ -50,20 +46,14 @@ class Game:
                     # Обрабатываем наше пользовательское событие с данными
                     last_message = event.message
                     print(f"Получено новое сообщение: {last_message}")
-                    entities.add(SUN_STRIKE)
 
-            # fill the screen with a color to wipe away anything from last frame
-            screen.fill("purple")
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_w]:
+                SUN_STRIKE.add(spells)
 
-            # pygame.draw.circle(screen, "red", player_pos, 40)
-            # screen.blit(fireball.animation[frames % 8], dest=player_pos)
-
-            background.draw(screen)
-            player.draw(screen)
-
-            for entity in entities:
-                entity.draw(screen)
-
+            # draw Groups
+            static_objects.draw(screen)
+            spells.draw(screen)
 
             # flip() the display to put your work on screen
             pygame.display.flip()
@@ -72,9 +62,11 @@ class Game:
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
             dt = clock.tick(FPS)
-            player.update(dt)
 
-            for entity in entities:
-                entity.update(dt)
+
+            # update Groups
+            static_objects.update(dt=dt)
+            spells.update(dt=dt)
+
 
         pygame.quit()

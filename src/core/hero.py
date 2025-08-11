@@ -4,37 +4,49 @@ from enum import auto
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
 
-class HeroState(State):
-    ATTACK1 = auto()
-    ATTACK2 = auto()
-    CLIMB = auto()
-    DEATH = auto()
-    HURT = auto()
-    IDLE = auto()
-    JUMP = auto()
-    PUSH = auto()
-    RUN = auto()
-    THROW = auto()
-    WALK = auto()
-    WALK_ATTACK = auto()
-
-"""
-Finite State Machine (FSM) implementation for Hero states management.
-
-This class extends FiniteStateMachine to handle transitions between Hero states. It initializes
-with predefined transitions between different Hero states.
-
-Args:
-    transitions: A dictionary mapping HeroState to callable functions that return the next HeroState.
-"""
-class HeroFSM(FiniteStateMachine):
-
-    def __init__(self, transitions: tp.Dict[HeroState, tp.Callable[..., HeroState]]):
-        super().__init__(HeroState, transitions)
 
 class Hero(LivingEntity):
-    """Base class for all heroes."""
-    pass
+    class HeroState(State):
+        ATTACK1 = auto()
+        ATTACK2 = auto()
+        CLIMB = auto()
+        DEATH = auto()
+        HURT = auto()
+        IDLE = auto()
+        JUMP = auto()
+        PUSH = auto()
+        RUN = auto()
+        THROW = auto()
+        WALK = auto()
+        WALK_ATTACK = auto()
+
+    class HeroFSM(FiniteStateMachine):
+        def __init__(self, hero: 'Hero'):
+            super().__init__(
+                Hero.HeroState,
+                {
+                }
+            )
+
+    def __init__(self, x, y, width, height):
+        super().__init__('hero', x, y, width, height)
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self._fsm.update(*args, **kwargs)
+
+    def process_input(self, *args, **kwargs):
+        # TODO: process input
+        return self.HeroState.IDLE
+
+    def _state_init(self, *args, **kwargs):
+        self._fsm.state = self.HeroState.IDLE
+
+    def _state_idle(self, *args, **kwargs):
+        pass
+
+    def _state_dead(self, *args, **kwargs):
+        self._fsm.state = self.HeroState.DEAD
 
 class Apprentice(Hero):
     pass

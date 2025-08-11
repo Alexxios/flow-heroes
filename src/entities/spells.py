@@ -1,4 +1,10 @@
-from core.spell import SpellFactory
+from pygame.transform import scale2x
+
+from core.spell import InstantSpell
+
+from utils.animation import Animation
+from utils.resource_manager import ResourceManager
 
 
-SUN_STRIKE = SpellFactory.create_spell('assets/gamekit/4 Sun strike/Sun-strike.png')
+animation = Animation(scale2x(ResourceManager('assets/gamekit/4 Sun strike/Sun-strike.png').load_image()), repeat=False)
+SUN_STRIKE = InstantSpell(animation)

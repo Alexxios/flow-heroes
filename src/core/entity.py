@@ -1,26 +1,28 @@
-from abc import ABC
-
-from pygame import Vector2, Surface
+from pygame import Vector2
 from pygame.sprite import Sprite
 
 from core.fsm import FiniteStateMachine
 
 
-class Entity(ABC):
-    name: str
-    pos: Vector2
-    _surf: Surface
-    _fsm: FiniteStateMachine
+class Entity(Sprite):
 
-    def __init__(self, name: str = "", pos: Vector2 = Vector2(0, 0)) -> None:
-        self.name = name
-        self.pos = Vector2(pos)
+    def __init__(self, name: str = "") -> None:
+        super().__init__()
+        self._name = name
 
-    def update(self, dt: int) -> None:
-        ...
+    @property
+    def name(self) -> str:
+        return self._name
 
-    def draw(self, parent: Surface) -> None:
-        ...
+    @property
+    def pos(self) -> Vector2:
+        return self.rect.center
+
+    @property
+    def fsm(self) -> FiniteStateMachine:
+        return self._fsm
+
+
 
 class LivingEntity(Entity):
     _hp: int
