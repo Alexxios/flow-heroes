@@ -20,6 +20,9 @@ class ResourceManager:
     def load_image(self, *relative_path) -> Surface:
         return pygame.image.load(self.base_path.joinpath(*relative_path))
 
+    def load_font(self, *relative_path, size=20):
+        return pygame.font.Font(self.base_path.joinpath(*relative_path), size)
+
     # def read_text(self, *relative_path, encoding="utf-8"):
     #     """Читает текстовый файл"""
     #     path = self.base_path.joinpath(*relative_path)

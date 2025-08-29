@@ -1,3 +1,5 @@
+import typing as tp
+
 from pygame import Vector2
 from pygame.sprite import Sprite
 
@@ -5,9 +7,10 @@ from core.fsm import FiniteStateMachine
 
 
 class Entity(Sprite):
+    _fsm: tp.Optional[FiniteStateMachine]
 
-    def __init__(self, name: str = "") -> None:
-        super().__init__()
+    def __init__(self, name: str = "", *groups) -> None:
+        super().__init__(*groups)
         self._name = name
 
     @property
@@ -15,11 +18,11 @@ class Entity(Sprite):
         return self._name
 
     @property
-    def pos(self) -> Vector2:
+    def pos(self) -> tuple[float, float]:
         return self.rect.center
 
     @property
-    def fsm(self) -> FiniteStateMachine:
+    def fsm(self) -> tp.Optional[FiniteStateMachine]:
         return self._fsm
 
 
