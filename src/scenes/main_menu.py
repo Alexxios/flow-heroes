@@ -1,13 +1,13 @@
 import os
 
 import pygame
-from pygame import QUIT, MOUSEBUTTONDOWN, KEYDOWN, K_ESCAPE
+from pygame import MOUSEBUTTONDOWN
 
-from scene import Scene
+from scenes import Scene, SceneManager
 
 class MainMenuScene(Scene):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, scene_manager: SceneManager):
+        super().__init__(scene_manager)
         # Colors
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
@@ -124,7 +124,6 @@ class MainMenuScene(Scene):
 
     def exit_game(self):
         print("Exiting game...")
-        self.terminate()
 
     def process_input(self, events):
         mouse_pos = pygame.mouse.get_pos()
@@ -137,14 +136,9 @@ class MainMenuScene(Scene):
                 break
 
         for event in events:
-            if event.type == QUIT:
-                self.terminate()
-            elif event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+            if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                 if self.selected_button:
                     self.selected_button["action"]()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    self.terminate()
 
     def update(self):
         # In a more complex scene, you might update animations or other elements here
@@ -165,45 +159,3 @@ class MainMenuScene(Scene):
             hover = button["rect"].collidepoint(mouse_pos)
             self.draw_button(screen, button, hover=hover)
 
-
-class Director:
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))
-        pygame.display.set_caption("Game with Scene System")
-        self.clock = pygame.time.Clock()
-        self.fps = 60
-        self.running = True
-        self.scene = MainMenuScene()
-
-    def run(self):
-        while self.running and self.scene is not None:
-            events = pygame.event.get()
-
-            # Process input
-            self.scene.process_input(events)
-
-            # Update scene
-            self.scene.update()
-
-            # Render scene
-            self.scene.render(self.screen)
-
-            # Update display
-            pygame.display.flip()
-
-            # Check for scene change
-            if self.scene.next is not self.scene:
-                self.scene = self.scene.next
-                if self.scene is None:
-                    self.running = False
-
-            # Cap the frame rate
-            self.clock.tick(self.fps)
-
-        pygame.quit()
-
-
-if __name__ == "__main__":
-    director = Director()
-    director.run()

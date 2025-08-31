@@ -1,12 +1,9 @@
 import pygame
-from pygame.sprite import Group
 
 from constants import FPS
-from core.background import Background
-from core.player import Player
-
-from controls.recognizer import Recognizer, DATA_EVENT
-from entities.spells import SUN_STRIKE
+from controls.recognizer import Recognizer
+from scenes import SceneManager
+from scenes.main_menu import MainMenuScene
 
 class Game:
     def __init__(self, title: str, width: int, height: int):
@@ -16,7 +13,6 @@ class Game:
         self.title = title
         self.width = width
         self.height = height
-        self.scenes = []
 
     def run(self):
         """Main game loop."""
@@ -26,34 +22,28 @@ class Game:
         clock = pygame.time.Clock()
         running = True
 
-
         recognizer = Recognizer(daemon=True)
         recognizer.start()
 
-        static_objects = Group()
-        background = Background()
-        background.add(static_objects)
-
-        spells = Group()
+        scene_manager = SceneManager()
+        scene_manager.push(MainMenuScene(scene_manager))
 
         while running:
             # poll for events
-            # pygame.QUIT event means the user clicked X to close your window
-            for event in pygame.event.get():
+            # pygame.QUIT event means the user clicked X to close the window
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     running = False
-                elif event.type == DATA_EVENT:
-                    # Обрабатываем наше пользовательское событие с данными
-                    last_message = event.message
-                    print(f"Получено новое сообщение: {last_message}")
+                    continue
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
-                SUN_STRIKE.add(spells)
+            scene = scene_manager.peek()
+            if scene is None:
+                running = False
+                continue
 
-            # draw Groups
-            static_objects.draw(screen)
-            spells.draw(screen)
+            scene.render(screen)
+            scene.process_input(events)
 
             # flip() the display to put your work on screen
             pygame.display.flip()
@@ -62,11 +52,8 @@ class Game:
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
             dt = clock.tick(FPS)
+            scene.update()
 
-
-            # update Groups
-            static_objects.update(dt=dt)
-            spells.update(dt=dt)
 
 
         pygame.quit()
