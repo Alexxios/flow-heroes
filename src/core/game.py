@@ -25,10 +25,14 @@ class Game:
         recognizer = Recognizer(daemon=True)
         recognizer.start()
 
-        scene_manager = SceneManager()
-        scene_manager.push(MainMenuScene(scene_manager))
+        manager = SceneManager(screen)
+        main_menu_scene = MainMenuScene(manager)
+        manager.add_scene("main_menu", main_menu_scene)
+        manager.set_scene("main_menu")
 
         while running:
+            dt = clock.tick(FPS)
+
             # poll for events
             # pygame.QUIT event means the user clicked X to close the window
             events = pygame.event.get()
@@ -37,23 +41,12 @@ class Game:
                     running = False
                     continue
 
-            scene = scene_manager.peek()
-            if scene is None:
-                running = False
-                continue
+            # handle events and update
+            manager.handle_events(events)
+            manager.update(dt)
 
-            scene.render(screen)
-            scene.process_input(events)
-
-            # flip() the display to put your work on screen
+            # draw and flip() the display to put everything on screen
+            manager.draw()
             pygame.display.flip()
-
-            # limits FPS to 60
-            # dt is delta time in seconds since last frame, used for framerate-
-            # independent physics.
-            dt = clock.tick(FPS)
-            scene.update()
-
-
 
         pygame.quit()

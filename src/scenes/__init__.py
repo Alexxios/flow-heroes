@@ -1,54 +1,84 @@
-import typing as tp
-from abc import ABC, abstractmethod
-from collections import deque
+import abc
+from typing import List, Dict, Optional
 
-class Scene(ABC):
-    def __init__(self, scene_manager: 'SceneManager'):
-        self._scene_manager = scene_manager
-        self._is_transparent = False
+import pygame
 
-    @abstractmethod
-    def process_input(self, events):
-        ...
+from ui import UIElement
 
-    @abstractmethod
-    def update(self):
-        ...
+class Scene(abc.ABC):
+    """Abstract base class for all game scenes"""
+    def __init__(self, manager: 'SceneManager'):
+        self.manager = manager
+        self.ui_elements: List[UIElement] = []
 
-    @abstractmethod
-    def render(self, screen):
-        ...
+    @abc.abstractmethod
+    def setup(self) -> None:
+        """Initialize the scene resources"""
+        pass
+
+    @abc.abstractmethod
+    def teardown(self) -> None:
+        """Clean up scene resources"""
+        pass
+
+    def handle_events(self, events: List[pygame.event.Event]) -> None:
+        """Process all events"""
+        for event in events:
+            for element in self.ui_elements:
+                if element.handle_event(event):
+                    break  # Event handled, stop propagation
+
+    def update(self, dt: float) -> None:
+        """Update scene state"""
+        for element in self.ui_elements:
+            element.update(dt)
+
+    def draw(self, surface: pygame.Surface) -> None:
+        """Draw the scene"""
+        for element in self.ui_elements:
+            element.draw(surface)
+
 
 class SceneManager:
-    def __init__(self):
-        self.scene_stack = deque()
+    """Manages transitions between different game scenes"""
+    def __init__(self, screen: pygame.Surface):
+        self.screen = screen
+        self.scenes: Dict[str, Scene] = {}
+        self.current_scene: Optional[Scene] = None
+        self.current_scene_name: Optional[str] = None
+        self.player_data = {
+            "balance": 1000  # Initial balance
+        }
 
-    def push(self, scene) -> None:
-        """Add a scene to the top of the stack"""
-        self.scene_stack.append(scene)
+    def add_scene(self, name: str, scene: Scene) -> None:
+        """Add a scene to the manager"""
+        self.scenes[name] = scene
 
-    def pop(self) -> tp.Optional[Scene]:
-        """Remove and return the top scene from the stack"""
-        if not self.is_empty():
-            return self.scene_stack.pop()
-        return None
+    def set_scene(self, name: str) -> None:
+        """Change to a different scene"""
+        if name not in self.scenes:
+            raise ValueError(f"Scene '{name}' not found")
 
-    def peek(self) -> tp.Optional[Scene]:
-        """Return the current active scene (top of stack)"""
-        if not self.is_empty():
-            return self.scene_stack[-1]
-        return None
+        # Teardown current scene if exists
+        if self.current_scene:
+            self.current_scene.teardown()
 
-    def replace(self, scene) -> None:
-        """Replace the current scene with a new one"""
-        if not self.is_empty():
-            self.pop()
-        self.push(scene)
+        # Setup new scene
+        self.current_scene = self.scenes[name]
+        self.current_scene_name = name
+        self.current_scene.setup()
 
-    def clear(self) -> None:
-        """Clear all scenes"""
-        self.scene_stack.clear()
+    def handle_events(self, events: List[pygame.event.Event]) -> None:
+        """Delegate event handling to current scene"""
+        if self.current_scene:
+            self.current_scene.handle_events(events)
 
-    def is_empty(self) -> bool:
-        """Check if the stack is empty"""
-        return len(self.scene_stack) == 0
+    def update(self, dt: float) -> None:
+        """Update current scene"""
+        if self.current_scene:
+            self.current_scene.update(dt)
+
+    def draw(self) -> None:
+        """Draw current scene"""
+        if self.current_scene:
+            self.current_scene.draw(self.screen)

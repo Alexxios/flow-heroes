@@ -36,10 +36,6 @@ class Spell(Entity):
     def animation(self):
         return self._animation
 
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        self._fsm.update(*args, **kwargs)
-
     @abstractmethod
     def _state_init(self, *args, **kwargs):
         ...
@@ -64,9 +60,6 @@ class InstantSpell(Spell):
         self.image = self.animation.start()
         self.rect = self.image.get_rect()
 
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        self._fsm.update(*args, **kwargs)
 
     def _state_init(self, *args, **kwargs):
         return self.SpellState.ACTIVE
@@ -90,10 +83,6 @@ class TrickSpell(Spell):
         super().__init__(name, dmg)
         self._fsm = self.SpellFSM(self)
         self._animation = animation
-
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        self._fsm.update(*args, **kwargs)
 
     def _state_init(self, *args, **kwargs):
         # TODO wait for collision

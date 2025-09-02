@@ -1,161 +1,140 @@
-import os
-
 import pygame
-from pygame import MOUSEBUTTONDOWN
 
+from ui import Button, BalanceBar
 from scenes import Scene, SceneManager
+from utils import load_image, load_font
+
 
 class MainMenuScene(Scene):
-    def __init__(self, scene_manager: SceneManager):
-        super().__init__(scene_manager)
-        # Colors
-        self.BLACK = (0, 0, 0)
-        self.WHITE = (255, 255, 255)
-        self.GRAY = (150, 150, 150)
-        self.HIGHLIGHT = (100, 100, 255)
+    """Main menu scene with buttons and balance display"""
+    def __init__(self, manager: SceneManager):
+        super().__init__(manager)
+        self.bg_color = (20, 20, 30)
+        self.title_font = None
+        self.button_font = None
+        self.balance_font = None
+        self.icons = {}  # Store icons for buttons
 
-        # Screen dimensions
-        self.WIDTH, self.HEIGHT = 800, 600
+    def setup(self) -> None:
+        """Initialize main menu resources"""
+        screen_width, screen_height = self.manager.screen.get_size()
 
-        # Load assets
-        self.load_assets()
 
-        # Button properties
-        self.buttons = [
-            {
-                "text": "Play",
-                "icon": self.icons["play"],
-                "rect": pygame.Rect(self.WIDTH // 2 - 100, 250, 200, 50),
-                "action": self.play_game
-            },
-            {
-                "text": "Settings",
-                "icon": self.icons["settings"],
-                "rect": pygame.Rect(self.WIDTH // 2 - 100, 320, 200, 50),
-                "action": self.open_settings
-            },
-            {
-                "text": "Exit",
-                "icon": self.icons["exit"],
-                "rect": pygame.Rect(self.WIDTH // 2 - 100, 390, 200, 50),
-                "action": self.exit_game
-            }
-        ]
-
-        self.selected_button = None
-
-    def load_assets(self):
-        # Load custom font - replace 'your_font.ttf' with your actual font file
+        # Load fonts (you would replace these with your custom font paths)
         try:
-            font_path = os.path.join("assets", "fonts", "your_font.ttf")
-            self.font = pygame.font.Font(font_path, 24)
-            self.title_font = pygame.font.Font(font_path, 40)
+            self.title_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 72)  # Use custom font here
+            self.button_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 48)  # Use custom font here
+            self.balance_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 36)  # Use custom font here
         except:
-            print("Could not load custom font. Using system font instead.")
-            self.font = pygame.font.SysFont("Arial", 24)
-            self.title_font = pygame.font.SysFont("Arial", 40)
+            # Fallback to default font if custom fonts fail to load
+            self.title_font = pygame.font.SysFont("Arial", 72)
+            self.button_font = pygame.font.SysFont("Arial", 48)
+            self.balance_font = pygame.font.SysFont("Arial", 36)
 
-        # Load logo - replace 'Logo.psd' with your actual converted logo file
-        try:
-            logo_path = os.path.join("assets", "images", "Logo.png")  # Note: Pygame can't load PSDs directly
-            self.logo = pygame.image.load(logo_path).convert_alpha()
-            # Scale logo if needed
-            logo_width = 400
-            logo_height = int(self.logo.get_height() * (logo_width / self.logo.get_width()))
-            self.logo = pygame.transform.scale(self.logo, (logo_width, logo_height))
-        except:
-            print("Could not load logo. Creating placeholder instead.")
-            self.logo = self.title_font.render("GAME LOGO", True, self.WHITE)
+        # Load icons (placeholders - replace with your actual icon loading)
+        icon_size = (32, 32)
+        self.icons = {
+            'play': self._create_placeholder_icon((0, 255, 0), icon_size),
+            'store': self._create_placeholder_icon((255, 255, 0), icon_size),
+            'settings': load_image("assets/gamekit/3 Icons/Icons_39.png"),
+            'exit': self._create_placeholder_icon((255, 0, 0), icon_size),
+            'coin': self._create_placeholder_icon((255, 215, 0), icon_size),
+        }
 
-        # Load icons from tileset
-        # In a real implementation, you would extract the 32x32 tiles from your PSD tileset
-        self.icons = {}
-        try:
-            # This is a placeholder for loading actual icons from your tileset
-            icons_path = os.path.join("assets", "images", "Icons")  # Convert PSD to PNG first
-            for i, icon in enumerate(["play", "settings", "exit"]):
-                self.icons[icon] = pygame.image.load(os.path.join(icons_path, f"Icons_{str(i+1).zfill(2)}.png")).convert_alpha()
+        # Calculate button positions
+        button_width = 300
+        button_height = 60
+        button_spacing = 20
+        start_y = screen_height // 2 - (button_height * 2 + button_spacing * 1.5)
 
-            # Load frame tiles for UI elements
-            # self.frame_tiles = [...] # You would extract frame tiles similarly
-        except:
-            print("Could not load tileset. Creating placeholder icons instead.")
-            # Create placeholder icons
-            self.icons["play"] = self.create_placeholder_icon((0, 255, 0))
-            self.icons["settings"] = self.create_placeholder_icon((0, 0, 255))
-            self.icons["exit"] = self.create_placeholder_icon((255, 0, 0))
+        # Create UI elements
+        self.ui_elements = []
 
-    def extract_tile(self, tileset, x, y, tile_size=32):
-        """Extract a tile from the tileset at the given position"""
-        tile = pygame.Surface((tile_size, tile_size), pygame.SRCALPHA)
-        tile.blit(tileset, (0, 0), (x * tile_size, y * tile_size, tile_size, tile_size))
-        return tile
+        # Add balance bar
+        balance_bar = BalanceBar(
+            20, 20, 200, 50,
+            self.balance_font,
+            self.icons['coin'],
+            self.manager.player_data["balance"]
+        )
+        self.ui_elements.append(balance_bar)
 
-    def create_placeholder_icon(self, color):
-        """Create a simple colored square as a placeholder icon"""
-        icon = pygame.Surface((32, 32), pygame.SRCALPHA)
+        # Add menu buttons
+        self.ui_elements.append(Button(
+            screen_width // 2 - button_width // 2,
+            start_y,
+            button_width, button_height,
+            "Play", self._on_play_click, self.button_font, self.icons['play']
+        ))
+
+        self.ui_elements.append(Button(
+            screen_width // 2 - button_width // 2,
+            start_y + button_height + button_spacing,
+            button_width, button_height,
+            "Store", self._on_store_click, self.button_font, self.icons['store']
+        ))
+
+        self.ui_elements.append(Button(
+            screen_width // 2 - button_width // 2,
+            start_y + (button_height + button_spacing) * 2,
+            button_width, button_height,
+            "Settings", self._on_settings_click, self.button_font, self.icons['settings']
+        ))
+
+        self.ui_elements.append(Button(
+            screen_width // 2 - button_width // 2,
+            start_y + (button_height + button_spacing) * 3,
+            button_width, button_height,
+            "Exit", self._on_exit_click, self.button_font, self.icons['exit']
+        ))
+
+    def _create_placeholder_icon(self, color, size):
+        """Create a placeholder icon for development"""
+        icon = pygame.Surface(size)
         icon.fill(color)
+        # Draw a simple shape to distinguish icons
+        pygame.draw.circle(icon, (255, 255, 255), (size[0]//2, size[1]//2), min(size)//3)
         return icon
 
-    def draw_button(self, screen, button, hover=False):
-        # Draw button background
-        color = self.HIGHLIGHT if hover else self.GRAY
-        pygame.draw.rect(screen, color, button["rect"], border_radius=5)
-        pygame.draw.rect(screen, self.WHITE, button["rect"], 2, border_radius=5)
+    def _on_play_click(self):
+        print("Play button clicked")
+        # In a complete implementation, you would transition to the game scene
+        # self.manager.set_scene("game")
 
-        # Draw icon
-        icon_pos = (button["rect"].x + 10, button["rect"].y + button["rect"].height // 2 - 16)
-        screen.blit(button["icon"], icon_pos)
+    def _on_store_click(self):
+        print("Store button clicked")
+        # self.manager.set_scene("store")
 
-        # Draw text
-        text = self.font.render(button["text"], True, self.WHITE)
-        text_pos = (button["rect"].x + 50, button["rect"].y + button["rect"].height // 2 - text.get_height() // 2)
-        screen.blit(text, text_pos)
+    def _on_settings_click(self):
+        print("Settings button clicked")
+        # self.manager.set_scene("settings")
 
-    def play_game(self):
-        print("Starting the game...")
-        # Switch to the game scene
-        # self.switch_to_scene(GameScene())
+    def _on_exit_click(self):
+        print("Exit button clicked")
+        pygame.quit()
+        exit(0)
 
-    def open_settings(self):
-        print("Opening settings...")
-        # Switch to the settings scene
-        # self.switch_to_scene(SettingsScene())
+    def teardown(self) -> None:
+        """Clean up resources"""
+        # Clear references to resources
+        self.title_font = None
+        self.button_font = None
+        self.balance_font = None
+        self.icons.clear()
+        self.ui_elements.clear()
 
-    def exit_game(self):
-        print("Exiting game...")
-
-    def process_input(self, events):
-        mouse_pos = pygame.mouse.get_pos()
-        self.selected_button = None
-
-        # Check which button is being hovered
-        for button in self.buttons:
-            if button["rect"].collidepoint(mouse_pos):
-                self.selected_button = button
-                break
-
-        for event in events:
-            if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-                if self.selected_button:
-                    self.selected_button["action"]()
-
-    def update(self):
-        # In a more complex scene, you might update animations or other elements here
-        pass
-
-    def render(self, screen):
+    def draw(self, surface: pygame.Surface) -> None:
+        """Draw the main menu"""
         # Fill background
-        screen.fill(self.BLACK)
+        surface.fill(self.bg_color)
 
-        # Draw logo
-        logo_pos = (self.WIDTH // 2 - self.logo.get_width() // 2, 50)
-        screen.blit(self.logo, logo_pos)
+        # Draw title
+        title_text = self.title_font.render("Platformer Game", True, (255, 255, 255))
+        title_rect = title_text.get_rect(
+            centerx=surface.get_width() // 2,
+            top=50
+        )
+        surface.blit(title_text, title_rect)
 
-        # Draw buttons
-        mouse_pos = pygame.mouse.get_pos()
-
-        for button in self.buttons:
-            hover = button["rect"].collidepoint(mouse_pos)
-            self.draw_button(screen, button, hover=hover)
-
+        # Draw UI elements
+        super().draw(surface)

@@ -25,6 +25,9 @@ class Entity(Sprite):
     def fsm(self) -> tp.Optional[FiniteStateMachine]:
         return self._fsm
 
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self._fsm.update(*args, **kwargs)
 
 
 class LivingEntity(Entity):
