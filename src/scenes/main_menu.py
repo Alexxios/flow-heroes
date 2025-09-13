@@ -18,6 +18,7 @@ class MainMenuScene(Scene):
     def setup(self) -> None:
         """Initialize main menu resources"""
         screen_width, screen_height = self.manager.screen.get_size()
+        self.background = load_image("assets/gamekit/Background/Background.png")
 
 
         # Load fonts (you would replace these with your custom font paths)
@@ -34,11 +35,11 @@ class MainMenuScene(Scene):
         # Load icons (placeholders - replace with your actual icon loading)
         icon_size = (32, 32)
         self.icons = {
-            'play': self._create_placeholder_icon((0, 255, 0), icon_size),
-            'store': self._create_placeholder_icon((255, 255, 0), icon_size),
+            'play': load_image("assets/gamekit/3 Icons/Icons_25.png"),
+            'store': load_image("assets/gamekit/3 Icons/Icons_48.png"),
             'settings': load_image("assets/gamekit/3 Icons/Icons_39.png"),
-            'exit': self._create_placeholder_icon((255, 0, 0), icon_size),
-            'coin': self._create_placeholder_icon((255, 215, 0), icon_size),
+            'exit': load_image("assets/gamekit/3 Icons/Icons_50.png"),
+            'coin': load_image("assets/gamekit/3 Icons/Icons_61.png"),
         }
 
         # Calculate button positions
@@ -99,7 +100,7 @@ class MainMenuScene(Scene):
     def _on_play_click(self):
         print("Play button clicked")
         # In a complete implementation, you would transition to the game scene
-        # self.manager.set_scene("game")
+        self.manager.set_scene("game")
 
     def _on_store_click(self):
         print("Store button clicked")
@@ -126,7 +127,7 @@ class MainMenuScene(Scene):
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the main menu"""
         # Fill background
-        surface.fill(self.bg_color)
+        surface.blit(pygame.transform.scale2x(self.background), (0, 0))
 
         # Draw title
         title_text = self.title_font.render("Platformer Game", True, (255, 255, 255))

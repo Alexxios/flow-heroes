@@ -10,6 +10,7 @@ import pickle
 import os
 
 from controls.gestures.movement import *
+from controls.gestures.commands import *
 from constants import GESTURE_EVENT
 
 
@@ -24,7 +25,7 @@ RECOGNITION_THRESHOLD = 0.8
 # Определим пользовательское событие
 DATA_EVENT = pygame.USEREVENT + 2
 
-gestures = [GestureLeft(), GestureRight(), GestureUp(), GestureDown()]
+gestures = [GesturePlay(), GesturePause(), GestureExit(), GestureShop()]
 
 class Recognizer(Thread):
     def __init__(self, *args, **kwargs):
@@ -74,7 +75,7 @@ class Recognizer(Thread):
 
         for gesture in gestures:
             scores = gesture.score(multi_hand_landmarks)
-
+            print(scores, best_score)
             for i, score in enumerate(scores):
                 if score > best_score[i]:
                     best_score[i] = score

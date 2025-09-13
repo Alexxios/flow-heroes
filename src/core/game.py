@@ -4,6 +4,7 @@ from constants import FPS
 from controls.recognizer import Recognizer
 from scenes import SceneManager
 from scenes.main_menu import MainMenuScene
+from scenes.game_scene import GameScene
 
 class Game:
     def __init__(self, title: str, width: int, height: int):
@@ -27,7 +28,9 @@ class Game:
 
         manager = SceneManager(screen)
         main_menu_scene = MainMenuScene(manager)
+        game_scene = GameScene(manager)
         manager.add_scene("main_menu", main_menu_scene)
+        manager.add_scene("game", game_scene)
         manager.set_scene("main_menu")
 
         while running:
