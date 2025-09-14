@@ -1,5 +1,7 @@
 import pygame
+from pygame.sprite import Group
 
+from core.background import Background
 from ui import Button, BalanceBar
 from scenes import Scene, SceneManager
 from utils import load_image, load_font
@@ -18,7 +20,10 @@ class MainMenuScene(Scene):
     def setup(self) -> None:
         """Initialize main menu resources"""
         screen_width, screen_height = self.manager.screen.get_size()
-        self.background = load_image("assets/gamekit/Background/Background.png")
+
+        # Init groups
+        self.static = Group()
+        Background(self.static)
 
 
         # Load fonts (you would replace these with your custom font paths)
@@ -127,7 +132,7 @@ class MainMenuScene(Scene):
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the main menu"""
         # Fill background
-        surface.blit(pygame.transform.scale2x(self.background), (0, 0))
+        self.static.draw(surface)
 
         # Draw title
         title_text = self.title_font.render("Platformer Game", True, (255, 255, 255))

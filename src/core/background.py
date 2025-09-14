@@ -1,12 +1,9 @@
-from pygame.transform import scale2x
-
 from core.entity import Entity
-from utils.resource_manager import ResourceManager
 
+from utils import load_image
 
 class Background(Entity):
-
-    def __init__(self):
-        super().__init__("background")
-        self.image = scale2x(ResourceManager("assets/gamekit/Background/Background.png").load_image())
+    def __init__(self, *groups):
+        super().__init__("background", *groups)
+        self.image = load_image("assets/gamekit/Background/Background.png")
         self.rect = self.image.get_rect()

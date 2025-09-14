@@ -1,35 +1,15 @@
 from typing import Optional, List
 
 import pygame
+from pygame.sprite import Group
+from pygame.transform import scale2x
 
 from scenes import Scene
+from utils import load_image
 
-class Player:
-    """Simple player class for demonstration purposes"""
-    def __init__(self, x: int = 400, y: int = 300):
-        self.x = x
-        self.y = y
-        self.width = 32
-        self.height = 32
-        self.speed = 200  # pixels per second
-
-    def update(self, dt: float, keys) -> None:
-        """Update player position based on key inputs"""
-        if keys[pygame.K_LEFT]:
-            self.x -= self.speed * dt
-        if keys[pygame.K_RIGHT]:
-            self.x += self.speed * dt
-        if keys[pygame.K_UP]:
-            self.y -= self.speed * dt
-        if keys[pygame.K_DOWN]:
-            self.y += self.speed * dt
-
-    def draw(self, surface: pygame.Surface) -> None:
-        """Draw the player on the screen"""
-        pygame.draw.rect(surface, (0, 255, 0),
-                        (self.x - self.width/2, self.y - self.height/2,
-                         self.width, self.height))
-
+from core.player import Player
+from core.hero import HeroFactory
+from core.background import Background
 
 class BalanceDisplay:
     """UI element to display the player's balance"""
@@ -107,15 +87,30 @@ class PauseOverlay:
 
 class GameScene(Scene):
     """Game scene that handles gameplay, player, and UI elements"""
-    def __init__(self, manager):
+    def __init__(self, manager, player = None, level = 1):
         super().__init__(manager)
-        self.level = 1
-        self.player = Player()
+        self.level = level
+
+        # Init groups of objects
+        self.static = Group()
+        self.dynamic = Group()
+        self.ui = Group()
+
+        Background(self.static)
+
+        if player is None or player.hero is None:
+            HeroFactory.create_hero(self.dynamic)
+        else:
+            # TODO: create by Player settings
+            pass
+
+        # Load level
+
+        #
         self.balance_display = BalanceDisplay()
         self.level_display = LevelDisplay(self.level)
         self.pause_overlay = PauseOverlay()
         self.is_paused = False
-        self.background_color = (40, 40, 80)  # Dark blue background
 
     def setup(self) -> None:
         """Initialize the game scene resources"""
@@ -157,29 +152,14 @@ class GameScene(Scene):
 
         # Update UI elements
         super().update(dt)
+        self.dynamic.update(dt=dt)
 
-        # Update player position based on keyboard input
-        keys = pygame.key.get_pressed()
-        self.player.update(dt, keys)
-
-        # Simple boundary checking
-        screen_width, screen_height = self.manager.screen.get_size()
-        if self.player.x < 0:
-            self.player.x = 0
-        if self.player.x > screen_width:
-            self.player.x = screen_width
-        if self.player.y < 0:
-            self.player.y = 0
-        if self.player.y > screen_height:
-            self.player.y = screen_height
 
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the scene"""
-        # Fill background
-        surface.fill(self.background_color)
 
-        # Draw player
-        self.player.draw(surface)
+        self.static.draw(surface)
+        self.dynamic.draw(surface)
 
         # Draw UI elements
         super().draw(surface)

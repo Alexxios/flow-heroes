@@ -19,6 +19,9 @@ if __name__ == "__main__":
     if not os.path.exists(gamekit_dir):
         os.makedirs(gamekit_dir)
         extract_nested_zips("../assets/craftpix-891169-platformer-game-kit-pixel-art.zip", gamekit_dir)
+        extract_nested_zips("../assets/craftpix-net-154153-free-tiny-pixel-hero-sprites-with-melee-attacks.zip", gamekit_dir)
+        extract_nested_zips("../assets/craftpix-net-440623-free-pixel-magic-sprite-effects-pack.zip", gamekit_dir)
+        extract_nested_zips("../assets/craftpix-net-661050-free-tiny-pixel-hero-sprites-with-bow-attacks.zip", gamekit_dir)
 
     game = Game("Game", 576 * 2, 324 * 2)
     game.run()

@@ -33,8 +33,8 @@ class Animation:
         return self[0]
 
     def update(self, dt) -> Surface:
-        self._millis = (self._millis + dt)
-        if self._millis > 1000:
+        self._millis += dt
+        if self._millis >= 1000:
             if self._repeat:
                 self._millis = self._millis % 1000
             else:
