@@ -4,7 +4,6 @@ from enum import Enum, auto
 
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
-from entities.spells import animation
 from utils import load_image
 from utils.animation import Animation
 

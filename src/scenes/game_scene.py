@@ -5,11 +5,14 @@ from pygame.sprite import Group
 from pygame.transform import scale2x
 
 from scenes import Scene
-from utils import load_image
 
 from core.player import Player
 from core.hero import HeroFactory
 from core.background import Background
+from core.level import Level
+
+from utils import load_image
+
 
 class BalanceDisplay:
     """UI element to display the player's balance"""
@@ -89,7 +92,7 @@ class GameScene(Scene):
     """Game scene that handles gameplay, player, and UI elements"""
     def __init__(self, manager, player = None, level = 1):
         super().__init__(manager)
-        self.level = level
+        self.level = Level(level - 1, player)
 
         # Init groups of objects
         self.static = Group()
@@ -99,7 +102,7 @@ class GameScene(Scene):
         Background(self.static)
 
         if player is None or player.hero is None:
-            HeroFactory.create_hero(self.dynamic)
+            self.hero = HeroFactory.create_hero(self.dynamic)
         else:
             # TODO: create by Player settings
             pass

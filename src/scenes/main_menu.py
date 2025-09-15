@@ -3,6 +3,8 @@ from pygame.sprite import Group
 
 from core.background import Background
 from ui import Button, BalanceBar
+from ui.icons import RIGHT_ICON, STORE_ICON
+
 from scenes import Scene, SceneManager
 from utils import load_image, load_font
 
@@ -28,9 +30,9 @@ class MainMenuScene(Scene):
 
         # Load fonts (you would replace these with your custom font paths)
         try:
-            self.title_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 72)  # Use custom font here
-            self.button_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 48)  # Use custom font here
-            self.balance_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 36)  # Use custom font here
+            self.title_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 48)  # Use custom font here
+            self.button_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 32)  # Use custom font here
+            self.balance_font = load_font("assets/gamekit/Font/Planes_ValMore.ttf", 20)  # Use custom font here
         except:
             # Fallback to default font if custom fonts fail to load
             self.title_font = pygame.font.SysFont("Arial", 72)
@@ -40,8 +42,8 @@ class MainMenuScene(Scene):
         # Load icons (placeholders - replace with your actual icon loading)
         icon_size = (32, 32)
         self.icons = {
-            'play': load_image("assets/gamekit/3 Icons/Icons_25.png"),
-            'store': load_image("assets/gamekit/3 Icons/Icons_48.png"),
+            'play': RIGHT_ICON,
+            'store': STORE_ICON,
             'settings': load_image("assets/gamekit/3 Icons/Icons_39.png"),
             'exit': load_image("assets/gamekit/3 Icons/Icons_50.png"),
             'coin': load_image("assets/gamekit/3 Icons/Icons_61.png"),
