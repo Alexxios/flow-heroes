@@ -43,7 +43,7 @@ class Hero(LivingEntity):
 
     def __init__(self, image_dir: str, *groups):
         name = image_dir.split()[-1]
-        super().__init__(name, *groups)
+        super().__init__(*groups, name=name)
         self._fsm = Hero.HeroFSM(self)
 
         self.surfaces = {

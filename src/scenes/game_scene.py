@@ -2,11 +2,9 @@ from typing import Optional, List
 
 import pygame
 from pygame.sprite import Group
-from pygame.transform import scale2x
 
 from scenes import Scene
 
-from core.player import Player
 from core.hero import HeroFactory
 from core.background import Background
 from core.level import Level
@@ -155,6 +153,7 @@ class GameScene(Scene):
 
         # Update UI elements
         super().update(dt)
+        # self.level.update(dt)
         self.dynamic.update(dt=dt)
 
 
@@ -162,6 +161,7 @@ class GameScene(Scene):
         """Draw the scene"""
 
         self.static.draw(surface)
+        self.level.ground.draw(surface)
         self.dynamic.draw(surface)
 
         # Draw UI elements

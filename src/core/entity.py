@@ -9,7 +9,7 @@ from core.fsm import FiniteStateMachine
 class Entity(Sprite):
     _fsm: tp.Optional[FiniteStateMachine]
 
-    def __init__(self, name: str = "", *groups) -> None:
+    def __init__(self, *groups, name='entity') -> None:
         super().__init__(*groups)
         self._name = name
 
