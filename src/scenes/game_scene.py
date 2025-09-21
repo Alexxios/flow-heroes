@@ -94,18 +94,9 @@ class GameScene(Scene):
 
         # Init groups of objects
         self.static = Group()
-        self.dynamic = Group()
         self.ui = Group()
 
         Background(self.static)
-
-        if player is None or player.hero is None:
-            self.hero = HeroFactory.create_hero(self.dynamic)
-        else:
-            # TODO: create by Player settings
-            pass
-
-        # Load level
 
         #
         self.balance_display = BalanceDisplay()
@@ -153,16 +144,14 @@ class GameScene(Scene):
 
         # Update UI elements
         super().update(dt)
-        # self.level.update(dt)
-        self.dynamic.update(dt=dt)
+        self.level.update(dt)
 
 
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the scene"""
 
         self.static.draw(surface)
-        self.level.ground.draw(surface)
-        self.dynamic.draw(surface)
+        self.level.draw(surface)
 
         # Draw UI elements
         super().draw(surface)

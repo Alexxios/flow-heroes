@@ -5,6 +5,7 @@ tensorflow==2.16.1
 ml-dtypes
 
 pygame-ce==2.5.5
+pymunk
 pytmx
 
 pytest

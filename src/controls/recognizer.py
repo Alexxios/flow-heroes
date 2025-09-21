@@ -22,10 +22,21 @@ GESTURE_FILE = "custom_gestures.pkl"
 SAMPLES_PER_GESTURE = 30
 RECOGNITION_THRESHOLD = 0.8
 
-# Определим пользовательское событие
-DATA_EVENT = pygame.USEREVENT + 2
+movement = [
+    GestureLeft(),
+    GestureRight(),
+    GestureUp(),
+    GestureDown()
+]
 
-gestures = [GesturePlay(), GesturePause(), GestureExit(), GestureShop()]
+commands = [
+    GesturePlay(),
+    GesturePause(),
+    GestureExit(),
+    GestureShop(),
+]
+
+gestures = movement + commands
 
 class Recognizer(Thread):
     def __init__(self, *args, **kwargs):
@@ -61,8 +72,7 @@ class Recognizer(Thread):
             if results.multi_hand_landmarks:
                 recognized = self.recognize(results.multi_hand_landmarks)
                 print(f"Gesture: {recognized}")
-                for name in recognized:
-                    self.post_gesture_event(name)
+                self.post_gesture_event(recognized)
 
 
         # Clean up
@@ -75,7 +85,6 @@ class Recognizer(Thread):
 
         for gesture in gestures:
             scores = gesture.score(multi_hand_landmarks)
-            print(scores, best_score)
             for i, score in enumerate(scores):
                 if score > best_score[i]:
                     best_score[i] = score
@@ -83,6 +92,6 @@ class Recognizer(Thread):
 
         return set(best_match) - {None}
 
-    def post_gesture_event(self, gesture_name: str):
-        event = pygame.event.Event(GESTURE_EVENT, {'gesture': gesture_name})
+    def post_gesture_event(self, gestures):
+        event = pygame.event.Event(GESTURE_EVENT, {'gestures': gestures})
         pygame.event.post(event)

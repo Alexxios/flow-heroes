@@ -68,8 +68,11 @@ class SceneManager:
         self.current_scene_name = name
         self.current_scene.setup()
 
-    def handle_events(self, events: List[pygame.event.Event]) -> None:
+    def handle_events(self) -> None:
         """Delegate event handling to current scene"""
+
+        events = pygame.event.get(pygame.MOUSEBUTTONDOWN)
+
         if self.current_scene:
             self.current_scene.handle_events(events)
 

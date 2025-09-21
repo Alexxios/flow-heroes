@@ -18,10 +18,15 @@ class Animation:
         self._millis = 0
         self._repeat = repeat
         self._ended = False
+        self._loop = 0
 
     @property
     def ended(self) -> bool:
         return self._ended
+
+    @property
+    def loop(self) -> int:
+        return self._loop
 
     def __getitem__(self, item):
         return self._surf.subsurface(
@@ -36,6 +41,7 @@ class Animation:
         self._millis += dt
         if self._millis >= 1000:
             if self._repeat:
+                self._loop += 1
                 self._millis = self._millis % 1000
             else:
                 self._ended = True

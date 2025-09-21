@@ -6,7 +6,7 @@ from pygame.sprite import Group
 
 from core.player import Player
 
-from core.hero import Hero
+from core.hero import HeroFactory
 from core.tile import Tile
 
 from utils import load_tiled_map
@@ -22,36 +22,32 @@ class Level:
         self.tiled_map = tiled_map
 
         # TODO: create groups and entities
+        # Physical objects
+        self.physical = Group()
+
+        # Ground for map layout
         self.ground = Group()
         for x, y, surf in tiled_map.get_layer_by_name('ground').tiles():
             Tile((x * 64, y * 64), surf, self.ground)
 
+        # entities for hero, enemies & breakable objects
+        self.entities = Group()
+        if player is None or player.hero is None:
+            self.hero = HeroFactory.create_hero(self.entities)
+
+            pos = (0, 0)
+            marker = tiled_map.get_object_by_name("hero")
+            if marker:
+                pos = (marker.x * 2, marker.y * 2)
+            self.hero.rect = self.hero.rect.move_to(center=pos)
+        else:
+            # TODO: create by Player settings
+            pass
+
     def draw(self, surface: Surface):
         self.ground.draw(surface)
+        self.entities.draw(surface)
 
     def update(self, dt: float) -> None:
-        self.ground.update(dt=dt)
-
-if __name__ == "__main__":
-    import pygame
-    import pytmx
-
-    # Initialize Pygame
-    pygame.init()
-    screen = pygame.display.set_mode((1920, 1080))
-
-    # Load the TMX map and its images
-    level = Level(0, None)
-    running = True
-    while running:
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                running = False
-                continue
-
-        level.draw(screen)
-
-        pygame.display.flip()
-        # ... rest of your game loop
-    pygame.quit()
+        # self.ground.update(dt=dt)
+        self.entities.update(dt=dt)

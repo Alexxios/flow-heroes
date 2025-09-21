@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="13" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="13" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="3">
  <tileset firstgid="1" name="plains" tilewidth="32" tileheight="32" tilecount="42" columns="7">
   <image source="../gamekit/Tiles/TileSet.png" width="224" height="192"/>
  </tileset>
  <tileset firstgid="43" source="../boxes.tsx"/>
  <tileset firstgid="59" source="../objects_animated.tsx"/>
  <tileset firstgid="70" source="../enemies.tsx"/>
+ <objectgroup id="8" name="Слой объектов 1">
+  <object id="2" name="hero" x="80" y="208">
+   <point/>
+  </object>
+ </objectgroup>
  <layer id="1" name="ground" width="30" height="13">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
