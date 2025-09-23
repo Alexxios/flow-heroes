@@ -33,20 +33,27 @@ class Entity(Sprite):
 class PhysicalEntity(Entity):
     body : Body
 
-    def __init__(self, *groups, name='physical entity', body_type=Body.KINEMATIC):
+    def __init__(self, body: Body, *groups, name='physical entity'):
         super().__init__(*groups, name=name)
-        self.body = Body(body_type=Body.KINEMATIC)
+        self.body = body
+
+    def _physics_update(self, *args, **kwargs):
+        pass
 
     def update(self, *args, **kwargs):
         # Physics update
+        self._physics_update(*args, **kwargs)
 
         # FSM update
         super().update(*args, **kwargs)
+
+        # Visual update
+        self.rect.center = self.body.position
 
 class LivingEntity(PhysicalEntity):
     _hp: int
     _atk: int
     _def: int
 
-    def __init__(self, *groups, name='living entity'):
-        super().__init__(*groups, name=name)
+    def __init__(self, body: Body, *groups, name='living entity'):
+        super().__init__(body, *groups, name=name)

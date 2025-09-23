@@ -3,8 +3,10 @@ import typing as tp
 import logging
 from enum import Enum, auto
 
+from pymunk import Body
 import pygame.event
 
+from core.physics import Physics
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
 from utils import load_image
