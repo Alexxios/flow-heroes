@@ -3,7 +3,9 @@ import logging
 import pygame
 
 from constants import FPS
-from controls.recognizer import Recognizer
+
+from core.player import Player
+
 from scenes import SceneManager
 from scenes.main_menu import MainMenuScene
 from scenes.game_scene import GameScene
@@ -33,12 +35,10 @@ class Game:
         pygame.display.set_caption("Flow Heroes")
         pygame.display.set_icon(load_image("assets/gamekit/2 512x512/2_2.png"))
 
-        clock = pygame.time.Clock()
-        running = True
+        # Initialize player
+        player = Player()
 
-        recognizer = Recognizer(daemon=True)
-        recognizer.start()
-
+        # UI setup
         manager = SceneManager(screen)
         main_menu_scene = MainMenuScene(manager)
         game_scene = GameScene(manager)
@@ -46,17 +46,21 @@ class Game:
         manager.add_scene("game", game_scene)
         manager.set_scene("main_menu")
 
+        # Loop
+        clock = pygame.time.Clock()
+        running = True
         while running:
             dt = clock.tick(FPS)
 
             # poll for events
             # pygame.QUIT event means the user clicked X to close the window
             events = pygame.event.get(pygame.QUIT)
-            logger.debug(f"{events}")
             for event in events:
                 if event.type == pygame.QUIT:
                     running = False
                     continue
+
+            print(player.get_inputs())
 
             # handle events and update
             manager.handle_events()

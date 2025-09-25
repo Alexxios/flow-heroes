@@ -9,13 +9,13 @@ class Gesture(ABC):
         self.name = name
 
     @abstractmethod
-    def score(self, multi_hand_landmarks: NamedTuple) -> float:
+    def score(self, multi_hand_landmarks: NamedTuple) -> tp.List[float]:
         ...
 
 class CustomGesture(Gesture):
     features: tp.Any
 
-    def score(self, multi_hand_landmarks: NamedTuple) -> float:
+    def score(self, multi_hand_landmarks: NamedTuple) -> tp.List[float]:
         # TODO: implement
         pass
 

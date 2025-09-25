@@ -1,26 +1,17 @@
-from threading import Thread
+import typing as tp
 
 import pygame
-
-import cv2
+import pygame.camera
 import mediapipe as mp
-import numpy as np
-import time
-import pickle
-import os
 
+from controls import Controls, Input
 from controls.gestures.movement import *
 from controls.gestures.commands import *
-from constants import GESTURE_EVENT
 
+from constants import RECOGNITION_THRESHOLD, GESTURE_EVENT
 
-mp_hands = mp.solutions.hands
-mp_drawing = mp.solutions.drawing_utils
-
-# Constants
-GESTURE_FILE = "custom_gestures.pkl"
-SAMPLES_PER_GESTURE = 30
-RECOGNITION_THRESHOLD = 0.8
+import logging
+logger = logging.getLogger(__name__)
 
 movement = [
     GestureLeft(),
@@ -38,46 +29,51 @@ commands = [
 
 gestures = movement + commands
 
-class Recognizer(Thread):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class Recognizer(Controls):
+    def __init__(self):
+        pygame.camera.init()
+
+        cam_list = pygame.camera.list_cameras()
+        if not cam_list:
+            logger.info("Cannot access the camera")
+            raise OSError()
+
+        # Initialize webcam
+        self.cam = pygame.camera.Camera(cam_list[0])
+        self.cam.start()
+        self.surface = pygame.Surface(self.cam.get_size())
 
         # Initialize MediaPipe Hands
-        self.hands = mp_hands.Hands(
+        self.hands = mp.solutions.hands.Hands(
             static_image_mode=False,
             max_num_hands=2,
             min_detection_confidence=0.6,
             min_tracking_confidence=0.6
         )
 
-        # Initialize webcam
-        self.cap = cv2.VideoCapture(0)
+    def __del__(self):
+        self.cam.stop()
+        pygame.camera.quit()
 
+    def get_inputs(self) -> tp.List[Input]:
+        return []
 
-    def run(self):
-        # Main loop
-        while self.cap.isOpened():
-            success, image = self.cap.read()
-            if not success:
-                print("Ignoring empty camera frame.")
-                continue
+    def update(self):
+        # Load image into surface
+        self.cam.get_image(self.surface)
 
-            # Convert the BGR image to RGB
-            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Convert surface to numpy array
+        image_rgb = pygame.surfarray.pixels3d(self.surface)
 
-            # Process the image and find hands
-            results = self.hands.process(image_rgb)
+        # Process the image and find hands
+        results = self.hands.process(image_rgb)
 
-            # Draw hand landmarks and process gestures
-            if results.multi_hand_landmarks:
-                recognized = self.recognize(results.multi_hand_landmarks)
-                print(f"Gesture: {recognized}")
-                self.post_gesture_event(recognized)
+        # Draw hand landmarks and process gestures
+        if results.multi_hand_landmarks:
+            recognized = self.recognize(results.multi_hand_landmarks)
+            print(f"Gesture: {recognized}")
+            self.post_gesture_event(recognized)
 
-
-        # Clean up
-        self.cap.release()
-        cv2.destroyAllWindows()
 
     def recognize(self, multi_hand_landmarks):
         best_score = [RECOGNITION_THRESHOLD] * len(multi_hand_landmarks)

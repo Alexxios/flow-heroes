@@ -9,4 +9,5 @@ ASSETS_ROOT = os.path.join(PROJECT_ROOT, 'assets')
 FPS = 60
 G = -981
 
+RECOGNITION_THRESHOLD = 0.6
 GESTURE_EVENT = pygame.USEREVENT + 1
