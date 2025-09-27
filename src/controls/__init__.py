@@ -10,8 +10,12 @@ class Input(Enum):
     DOWN = auto()
     ATTACK = auto()
     CAST = auto()
+    SUN_STRIKE = auto()
 
 class Controls(ABC):
     @abstractmethod
     def get_inputs(self) -> tp.List[Input]:
         ...
+
+    def get_surface(self):
+        return None

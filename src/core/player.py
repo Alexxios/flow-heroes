@@ -23,8 +23,8 @@ class Player:
             )
 
         try:
-            # self._controls = Recognizer()
-            raise OSError()
+            self._controls = Recognizer()
+            # raise OSError()
         except OSError:
             self._controls = KeyboardMouse()
 
@@ -34,6 +34,10 @@ class Player:
     @property
     def name(self):
         return self._name
+
+    @property
+    def controls(self):
+        return self._controls
 
     @property
     def hero_config(self):

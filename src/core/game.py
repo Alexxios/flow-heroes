@@ -70,6 +70,9 @@ class Game:
 
             # draw and flip() the display to put everything on screen
             self.manager.draw()
+            surface = self.player.controls.get_surface()
+            if surface is not None:
+                self.screen.blit(pygame.transform.scale(surface, (self.width / 3, self.height / 3)))
             pygame.display.flip()
 
         pygame.quit()

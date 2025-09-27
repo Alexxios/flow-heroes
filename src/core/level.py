@@ -6,6 +6,7 @@ from pygame.sprite import Group
 import pymunk.pygame_util
 from pymunk import Space, Poly, Body
 
+from controls import Input
 from core.hero import HeroConfig, Hero
 from core.player import Player
 from core.tile import Tile
@@ -22,6 +23,7 @@ class Level:
         # Load map
         tiled_map = _load(n)
         self.tiled_map = tiled_map
+        self.player = player
 
         # Setup physics
         self.space = Space()
@@ -53,6 +55,5 @@ class Level:
         self.dynamic.draw(surface)
 
     def update(self, dt: int) -> None:
-        print(self.dynamic.sprites()[0].body.position)
         self.space.step(dt / 1000)
-        self.dynamic.update(dt=dt)
+        self.dynamic.update(dt=dt, inputs=self.player.get_inputs())

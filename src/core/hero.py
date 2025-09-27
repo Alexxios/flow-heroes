@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pymunk import Body, Poly
 import pygame.event
 
+from controls import Input
 from core.physics import Physics
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
@@ -57,7 +58,8 @@ class Hero(LivingEntity):
                     Hero.HeroState.INIT: hero._state_init,
                     Hero.HeroState.IDLE: hero._state_idle,
                     Hero.HeroState.DEAD: hero._state_dead,
-                    Hero.HeroState.WALK: hero._state_walk
+                    Hero.HeroState.WALK: hero._state_walk,
+                    Hero.HeroState.JUMP: hero._state_jump,
                 }
             )
 
@@ -88,33 +90,43 @@ class Hero(LivingEntity):
         self.rect = self.image.get_rect(center=pos)
         self.animation = None
 
+    def _physics_update(self, *args, **kwargs):
+        velocity_x, velocity_y = 0, self.body.velocity[1]
+        if Input.RIGHT in kwargs['inputs']:
+            velocity_x = 128
+        elif Input.LEFT in kwargs['inputs']:
+            velocity_x = -128
+
+        # if Input.UP in kwargs['inputs'] and self._fsm.state != Hero.HeroState.JUMP:
+        #     velocity_y = -256
+
+        self.old_velocity_y = self.body.velocity[1]
+        self.body.velocity = velocity_x, velocity_y
+
+
     def update(self, *args, **kwargs):
-        # FSM update
         old_state = self._fsm.state
-        super().update(*args, **kwargs) # also Physics update here
+        super().update(*args, **kwargs)
 
         if old_state == self._fsm.state:
             self.image = self.animation.update(kwargs['dt'])
         else:
             self.animation = Animation(self.surfaces[self._fsm.state])
             self.image = self.animation.start()
-        self.image = pygame.transform.flip(self.image, self.flip, False)
+        self.image = pygame.transform.flip(self.image, self._flip, False)
 
     def process(self):
-
-        # process user inputs
-        events = pygame.event.get(GESTURE_EVENT)
-        logger.debug(events)
-
         state = Hero.HeroState.IDLE
-        for event in events:
-            gestures = event.dict["gestures"]
-            if "right" in gestures:
-                self.flip = False
-                state = Hero.HeroState.WALK
-            if "left" in gestures:
-                self.flip = True
-                state = Hero.HeroState.WALK
+        if self.body.velocity[0] > 0:
+            self._flip = False
+            state = Hero.HeroState.WALK
+        elif self.body.velocity[0] < 0:
+            self._flip = True
+            state = Hero.HeroState.WALK
+
+        if self.body.velocity[1] < -10:
+            state = Hero.HeroState.JUMP
+
         return state
 
     def _state_init(self, *args, **kwargs):
@@ -130,6 +142,11 @@ class Hero(LivingEntity):
         if self.animation.loop > 0:
             return self.process()
         return Hero.HeroState.WALK
+
+    def _state_jump(self, *args, **kwargs):
+        if self.animation.loop > 0:
+            return self.process()
+        return Hero.HeroState.JUMP
 
 class Apprentice(Hero):
     pass
