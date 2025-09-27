@@ -25,28 +25,32 @@ class Game:
         self.height = height
 
     def run(self):
-        """Main game loop."""
-
         logger.info("Game launched")
 
         # pygame setup
         pygame.init()
-        screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.SCALED)
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.SCALED)
         pygame.display.set_caption("Flow Heroes")
         pygame.display.set_icon(load_image("assets/gamekit/2 512x512/2_2.png"))
 
         # Initialize player
-        player = Player()
+        self.player = Player()
 
         # UI setup
-        manager = SceneManager(screen)
-        main_menu_scene = MainMenuScene(manager)
-        game_scene = GameScene(manager)
-        manager.add_scene("main_menu", main_menu_scene)
-        manager.add_scene("game", game_scene)
-        manager.set_scene("main_menu")
+        self.manager = SceneManager(self.screen)
+        main_menu_scene = MainMenuScene(self.manager)
+        game_scene = GameScene(self.manager, self.player)
+        self.manager.add_scene("main_menu", main_menu_scene)
+        self.manager.add_scene("game", game_scene)
+        self.manager.set_scene("main_menu")
 
-        # Loop
+
+        # Run main loop
+        self._loop()
+
+
+    def _loop(self):
+        """Main game loop."""
         clock = pygame.time.Clock()
         running = True
         while running:
@@ -60,14 +64,12 @@ class Game:
                     running = False
                     continue
 
-            print(player.get_inputs())
-
             # handle events and update
-            manager.handle_events()
-            manager.update(dt)
+            self.manager.handle_events()
+            self.manager.update(dt)
 
             # draw and flip() the display to put everything on screen
-            manager.draw()
+            self.manager.draw()
             pygame.display.flip()
 
         pygame.quit()

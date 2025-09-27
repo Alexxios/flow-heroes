@@ -51,5 +51,4 @@ class KeyboardMouse(Controls):
 
         inputs.extend([self._mouse_mapping[button] for button in self._mouse_mapping.keys() if mouse_just_pressed[button]])
 
-        logger.debug(str(inputs))
         return inputs

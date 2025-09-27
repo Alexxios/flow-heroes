@@ -3,9 +3,9 @@ from typing import Optional, List
 import pygame
 from pygame.sprite import Group
 
+from core.player import Player
 from scenes import Scene
 
-from core.hero import HeroFactory
 from core.background import Background
 from core.level import Level
 
@@ -88,7 +88,7 @@ class PauseOverlay:
 
 class GameScene(Scene):
     """Game scene that handles gameplay, player, and UI elements"""
-    def __init__(self, manager, player = None, level = 1):
+    def __init__(self, manager, player: Player, level = 1):
         super().__init__(manager)
         self.level = Level(level - 1, player)
 

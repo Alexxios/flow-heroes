@@ -7,7 +7,7 @@
  <tileset firstgid="59" source="../objects_animated.tsx"/>
  <tileset firstgid="70" source="../enemies.tsx"/>
  <objectgroup id="8" name="Слой объектов 1">
-  <object id="2" name="hero" x="80" y="208">
+  <object id="2" name="hero" x="80" y="160">
    <point/>
   </object>
  </objectgroup>

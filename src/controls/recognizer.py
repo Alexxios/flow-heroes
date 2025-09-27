@@ -71,7 +71,6 @@ class Recognizer(Controls):
         # Draw hand landmarks and process gestures
         if results.multi_hand_landmarks:
             recognized = self.recognize(results.multi_hand_landmarks)
-            print(f"Gesture: {recognized}")
             self.post_gesture_event(recognized)
 
 

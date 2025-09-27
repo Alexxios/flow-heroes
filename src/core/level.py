@@ -1,64 +1,58 @@
 import pathlib
 
-import pymunk.pygame_util
-from pymunk import Poly
 import pygame
 from pygame import Surface
 from pygame.sprite import Group
+import pymunk.pygame_util
+from pymunk import Space, Poly, Body
 
+from core.hero import HeroConfig, Hero
 from core.player import Player
-
-from core.physics import Physics
-from core.hero import HeroFactory
 from core.tile import Tile
 
 from utils import load_tiled_map
-
+from constants import G
 
 _BASE_DIR = "assets/levels"
 _levels = ["test_level.tmx"]
 _load = lambda n: load_tiled_map(pathlib.Path(_BASE_DIR, _levels[n]))
 
 class Level:
-    def __init__(self, n, player: Player):
+    def __init__(self, n: int, player: Player):
+        # Load map
         tiled_map = _load(n)
         self.tiled_map = tiled_map
 
-        # TODO: create groups and entities
-        # Physical objects
-        self.physical = Group()
+        # Setup physics
+        self.space = Space()
+        self.space.gravity = 0, G
+        pymunk.pygame_util.positive_y_is_up = False
 
-        # Ground for map layout
-        self.ground = Group()
+        # Static objects group
+        self.static = Group()
+
         for x, y, surf in tiled_map.get_layer_by_name('ground').tiles():
-            Tile.create_rect_tile(x * 64, y * 64, surf, self.ground)
+            tile = Tile.create_tile(x * 64, y * 64, surf, self.static)
+            tile.body.body_type = Body.STATIC
+            tile.body.position = tile.rect.center
+            shape = Poly.create_box(tile.body, tile.rect.size)
+            self.space.add(tile.body, shape)
 
-        # entities for hero, enemies & breakable objects
-        self.entities = Group()
-        # if player is None or player.hero is None:
-        #     self.hero = HeroFactory.create_hero(self.entities)
-        #
-        #     pos = (0, 0)
-        #     marker = tiled_map.get_object_by_name("hero")
-        #     if marker:
-        #         pos = (marker.x * 2, marker.y * 2)
-        #     self.hero.rect = self.hero.rect.move_to(center=pos)
-        # else:
-        #     # TODO: create by Player settings
-        #     pass
+        # Dynamic object group
+        self.dynamic = Group()
+
+        hero_meta = tiled_map.get_object_by_name("hero")
+        hero = Hero(player.hero_config, (hero_meta.x * 2, hero_meta.y * 2), self.dynamic)
+        hero.body.position = hero.rect.center
+        shape = Poly.create_box(hero.body, hero.rect.size)
+        shape.mass = 10
+        self.space.add(hero.body, shape)
 
     def draw(self, surface: Surface):
-        self.ground.draw(surface)
+        self.static.draw(surface)
+        self.dynamic.draw(surface)
 
-        # space = Physics.get_space()
-        # for shape in space.shapes:
-        #     if isinstance(shape, Poly):
-        #         pygame.draw.rect(surface, (0, 0, 255), shape.bb, 2)
-        #         pygame.draw.circle(surface, (255, 0, 0), shape.body.position, 4, 2)
-        #         print(shape.bb)
-
-        self.entities.draw(surface)
-
-    def update(self, dt: float) -> None:
-        # self.ground.update(dt=dt)
-        self.entities.update(dt=dt)
+    def update(self, dt: int) -> None:
+        print(self.dynamic.sprites()[0].body.position)
+        self.space.step(dt / 1000)
+        self.dynamic.update(dt=dt)

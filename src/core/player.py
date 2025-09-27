@@ -4,16 +4,23 @@ from controls import Controls
 from controls.recognizer import Recognizer
 from controls.standard import KeyboardMouse
 
-from core.hero import Hero
+from core.hero import HeroConfig
+
 
 class Player:
     _name: str
     _controls: Controls
-    _hero: tp.Optional[Hero]
+    _hero_config: HeroConfig
 
-    def __init__(self, name: str = "player"):
+    def __init__(self, name: str = "player", hero_config: tp.Optional[HeroConfig] = None):
         self._name = name
-        self._hero = None
+        if hero_config:
+            self._hero_config = hero_config
+        else:
+            self._hero_config = HeroConfig(
+                HeroConfig.Path.APPRENTICE,
+                HeroConfig.Skin.DUDE_MONSTER,
+            )
 
         try:
             # self._controls = Recognizer()
@@ -29,9 +36,5 @@ class Player:
         return self._name
 
     @property
-    def hero(self):
-        return self._hero
-
-    @hero.setter
-    def hero(self, value: Hero):
-        self._hero = value
+    def hero_config(self):
+        return self._hero_config

@@ -4,7 +4,7 @@ import pygame.image
 import pygame.transform
 import pytmx.util_pygame
 
-from constants import PROJECT_ROOT, G
+from constants import PROJECT_ROOT
 
 def load_image(path):
     return pygame.transform.scale2x(pygame.image.load(pathlib.Path(PROJECT_ROOT, path)))

@@ -2,8 +2,9 @@ import os.path
 import typing as tp
 import logging
 from enum import Enum, auto
+from dataclasses import dataclass, field
 
-from pymunk import Body
+from pymunk import Body, Poly
 import pygame.event
 
 from core.physics import Physics
@@ -15,12 +16,23 @@ from constants import GESTURE_EVENT
 
 logger = logging.getLogger(__name__)
 
-_HERO_IMAGE_DIRS = [
-    "assets/gamekit/1 Pink_Monster",
-    "assets/gamekit/2 Owlet_Monster",
-    "assets/gamekit/3 Dude_Monster"
-]
 
+@dataclass
+class HeroConfig:
+    class Path(Enum):
+        APPRENTICE = "apprentice"
+        WARRIOR = "warrior"
+        HUNTER = "hunter"
+
+    class Skin(Enum):
+        PINK_MONSTER = "assets/gamekit/1 Pink_Monster"
+        OWLET_MONSTER = "assets/gamekit/2 Owlet_Monster"
+        DUDE_MONSTER = "assets/gamekit/3 Dude_Monster"
+
+    hero_path: Path
+    hero_skin: Skin
+    level: int = 1
+    skills: tp.List[str] = field(default_factory=list)
 
 class Hero(LivingEntity):
     class HeroState(State):
@@ -49,9 +61,12 @@ class Hero(LivingEntity):
                 }
             )
 
-    def __init__(self, image_dir: str, *groups):
+    def __init__(self, hero_config: HeroConfig, pos, *groups):
+        image_dir = hero_config.hero_skin.value
         name = image_dir.split()[-1]
+
         super().__init__(*groups, name=name)
+
         self._fsm = Hero.HeroFSM(self)
 
         self.surfaces = {
@@ -69,12 +84,9 @@ class Hero(LivingEntity):
             Hero.HeroState.WALK_ATTACK: load_image(os.path.join(image_dir, f"{name}_Walk+Attack_6.png")),
             Hero.HeroState.WALK: load_image(os.path.join(image_dir, f"{name}_Walk_6.png")),
         }
-
         self.image = self.surfaces[Hero.HeroState.INIT]
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect(center=pos)
         self.animation = None
-        self.update_rate = 15
-        self.flip = False
 
     def update(self, *args, **kwargs):
         # FSM update
@@ -127,10 +139,3 @@ class Warrior(Hero):
 
 class Hunter(Hero):
     pass
-
-class HeroFactory:
-    @staticmethod
-    def create_hero(*groups, hero_type = "apprentice", hero_id = 0):
-        if hero_type == "apprentice":
-            return Apprentice(_HERO_IMAGE_DIRS[hero_id], *groups)
-        return None
