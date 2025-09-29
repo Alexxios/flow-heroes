@@ -1,7 +1,7 @@
 import pygame
 from pygame.sprite import Group
 
-from core.background import Background
+from entities.background import Background
 from ui import Button, BalanceBar
 from ui.icons import RIGHT_ICON, STORE_ICON
 

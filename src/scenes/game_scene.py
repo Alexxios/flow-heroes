@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 
 import pygame
 from pygame.sprite import Group
@@ -6,10 +6,8 @@ from pygame.sprite import Group
 from core.player import Player
 from scenes import Scene
 
-from core.background import Background
-from core.level import Level
-
-from utils import load_image
+from entities.background import Background
+from level.__init__ import Level
 
 
 class BalanceDisplay:

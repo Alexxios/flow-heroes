@@ -5,8 +5,8 @@
     },
     "activeFile": "levels/test_level.tmx",
     "expandedProjectPaths": [
-        "levels",
-        "."
+        ".",
+        "levels"
     ],
     "file.lastUsedOpenFilter": "Все файлы (*)",
     "fileStates": {
@@ -27,11 +27,11 @@
             "expandedGroupLayers": [
                 5
             ],
-            "scale": 1.5,
-            "selectedLayer": 2,
+            "scale": 5.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 368,
-                "y": 418.6666666666667
+                "x": 113.27272727272725,
+                "y": 184.72727272727275
             }
         },
         "levels/test_level.tmx#plains": {

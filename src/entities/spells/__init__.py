@@ -3,8 +3,8 @@ from enum import auto
 
 from pygame import Vector2
 
-from core.entity import Entity
 from core.fsm import State, FiniteStateMachine
+from core.entity import Entity
 
 from utils.animation import Animation
 
@@ -13,7 +13,7 @@ class Spell(Entity):
     class SpellState(State):
         ACTIVE = auto()
 
-    class SpellFSM(FiniteStateMachine):
+    class FSM(FiniteStateMachine):
         def __init__(self, spell: 'Spell'):
             super().__init__(
                 Spell.SpellState,
@@ -24,17 +24,21 @@ class Spell(Entity):
                 }
             )
 
-    def __init__(self, name: str = "spell", dmg: int = 10):
-        super().__init__(name)
+    def __init__(self, animation: Animation, *groups, name: str = "spell", dmg: int = 10, pos: Vector2 = (0, 0)):
+        super().__init__(*groups, name=name)
+        self._fsm = Spell.FSM(self)
+        self._animation = animation
         self._dmg = dmg
+        self.image = self._animation.start()
+        self.rect = self.image.get_rect(midbottom=pos)
 
     @property
     def dmg(self):
         return self._dmg
 
-    @property
-    def animation(self):
-        return self._animation
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self.image = self._animation.update(kwargs['dt'])
 
     @abstractmethod
     def _state_init(self, *args, **kwargs):
@@ -49,18 +53,6 @@ class Spell(Entity):
         ...
 
 class InstantSpell(Spell):
-    def __init__(self,
-        animation: Animation,
-        name: str = "instant_spell",
-        dmg: int = 10
-    ):
-        super().__init__(name, dmg)
-        self._fsm = self.SpellFSM(self)
-        self._animation = animation
-        self.image = self.animation.start()
-        self.rect = self.image.get_rect()
-
-
     def _state_init(self, *args, **kwargs):
         return self.SpellState.ACTIVE
 
@@ -68,22 +60,12 @@ class InstantSpell(Spell):
         return self.SpellState.DEAD
 
     def _state_active(self, *args, **kwargs):
-        self.image = self.animation.update(kwargs['dt'])
-        if self.animation.ended:
+        if self._animation.ended:
             self.kill()
             return self.SpellState.DEAD
         return self.SpellState.ACTIVE
 
 class TrickSpell(Spell):
-    def __init__(self,
-        animation: Animation,
-        name: str = "trick_spell",
-        dmg: int = 10
-    ):
-        super().__init__(name, dmg)
-        self._fsm = self.SpellFSM(self)
-        self._animation = animation
-
     def _state_init(self, *args, **kwargs):
         # TODO wait for collision
         return self.SpellState.ACTIVE
@@ -94,21 +76,35 @@ class TrickSpell(Spell):
     def _state_active(self, *args, **kwargs):
         return self.SpellState.ACTIVE
 
-class TravellingSpell(Spell):
+class ProjectileSpell(Spell):
     def __init__(self,
         animation: Animation,
-        name: str = "travelling_spell",
+        *groups,
+        name: str = "projectile_spell",
         dmg: int = 10,
+        pos: Vector2 = (0, 0),
         direction: Vector2 = Vector2(0, 0)
     ):
-        super().__init__(name, dmg)
-        self._fsm = self.SpellFSM(self)
+        super().__init__(animation, *groups, name=name, dmg=dmg, pos=pos)
+        self._direction = direction
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self.rect.move_ip(self._direction[0] * kwargs['dt'], self._direction[1] * kwargs['dt'])
+
+    def _state_init(self, *args, **kwargs):
+        return self.SpellState.ACTIVE
+
+    def _state_dead(self, *args, **kwargs):
+        return self.SpellState.DEAD
+
+    def _state_active(self, *args, **kwargs):
+        # TODO wait for collision
+        return self.SpellState.ACTIVE
+
 
 class StatusSpell(Spell):
     pass
 
 class ContinuousSpell(Spell):
-    pass
-
-class SpellFactory:
     pass

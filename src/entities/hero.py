@@ -4,16 +4,13 @@ import logging
 from enum import Enum, auto
 from dataclasses import dataclass, field
 
-from pymunk import Body, Poly
 import pygame.event
 
 from controls import Input
-from core.physics import Physics
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
 from utils import load_image
 from utils.animation import Animation
-from constants import GESTURE_EVENT
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +60,7 @@ class Hero(LivingEntity):
                 }
             )
 
-    def __init__(self, hero_config: HeroConfig, pos, *groups):
+    def __init__(self, hero_config: HeroConfig, *groups):
         image_dir = hero_config.hero_skin.value
         name = image_dir.split()[-1]
 
@@ -87,7 +84,7 @@ class Hero(LivingEntity):
             Hero.HeroState.WALK: load_image(os.path.join(image_dir, f"{name}_Walk_6.png")),
         }
         self.image = self.surfaces[Hero.HeroState.INIT]
-        self.rect = self.image.get_rect(center=pos)
+        self.rect = self.image.get_rect()
         self.animation = None
 
     def _physics_update(self, *args, **kwargs):

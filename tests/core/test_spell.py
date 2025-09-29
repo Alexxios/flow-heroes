@@ -1,7 +1,8 @@
 import unittest
 
 import pygame
-from src.core.spell import ProjectileSpell, Animation, Vector2
+
+from entities.spells.projectile import FIREBALL
 
 class TestProjectileSpell(unittest.TestCase):
     def test_fireball(self):
@@ -10,14 +11,7 @@ class TestProjectileSpell(unittest.TestCase):
         clock = pygame.time.Clock()
 
         spells = pygame.sprite.Group()
-        fireball = ProjectileSpell(
-            animation=Animation(pygame.image.load("/Users/glotovaleksei/flow-heroes/assets/gamekit/10 Fire ball/Fire-ball.png")),
-            name="fireball",
-            dmg=10,
-            pos=Vector2(0, 0),
-            direction=Vector2(0.2, 0)
-        )
-        fireball.add(spells)
+        fireball = FIREBALL.create(spells, pos=(100, 100))
 
         running = True
         while running:

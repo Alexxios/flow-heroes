@@ -1,9 +1,5 @@
-import pygame
 from pygame import Surface
 from pygame.transform import scale2x
-from pymunk import Body, Poly
-
-from core.physics import Physics
 from core.entity import PhysicalEntity
 
 class Tile(PhysicalEntity):

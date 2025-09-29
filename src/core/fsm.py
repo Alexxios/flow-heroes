@@ -16,13 +16,16 @@ class FiniteStateMachine(ABC, Generic[T]):
     states: tp.Type[T]
     transitions: tp.Dict[T, tp.Callable[..., T]]
     state: T
+    previous_state: T
 
     def __init__(self, states: tp.Type[T], transitions: tp.Dict[T, tp.Callable[..., T]]):
         self.states = states
         self.transitions = transitions
         self.state = states.INIT
+        self.previous_state = states.INIT
 
     def update(self, *args, **kwargs) -> None:
+        self.previous_state = self.state
         self.state = self.transitions[self.state](*args, **kwargs)
 
 class SingletonFSM(FiniteStateMachine):

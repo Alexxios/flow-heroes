@@ -4,7 +4,7 @@ from controls import Controls
 from controls.recognizer import Recognizer
 from controls.standard import KeyboardMouse
 
-from core.hero import HeroConfig
+from entities.hero import HeroConfig
 
 
 class Player:
@@ -20,6 +20,7 @@ class Player:
             self._hero_config = HeroConfig(
                 HeroConfig.Path.APPRENTICE,
                 HeroConfig.Skin.DUDE_MONSTER,
+                skills=["Sun Strike"]
             )
 
         try:

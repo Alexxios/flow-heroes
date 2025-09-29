@@ -1,9 +1,9 @@
 import typing as tp
 
-from pymunk import Body, Space
+from pymunk import Body
 from pygame.sprite import Sprite
 
-from core.fsm import FiniteStateMachine
+from core.fsm import FiniteStateMachine, State
 
 class Entity(Sprite):
     _fsm: tp.Optional[FiniteStateMachine]
@@ -12,6 +12,7 @@ class Entity(Sprite):
         super().__init__(*groups)
         self._name = name
         self._flip = False
+        self._state_changed = False
 
     @property
     def name(self) -> str:
@@ -32,6 +33,10 @@ class Entity(Sprite):
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         self._fsm.update(*args, **kwargs)
+    
+    def kill(self):
+        super().kill()
+        self._fsm.state = State.DEAD
 
 
 class PhysicalEntity(Entity):
@@ -56,7 +61,6 @@ class PhysicalEntity(Entity):
 class LivingEntity(PhysicalEntity):
     _hp: int
     _atk: int
-    _def: int
 
     def __init__(self, *groups, name='living entity'):
         super().__init__(*groups, name=name)

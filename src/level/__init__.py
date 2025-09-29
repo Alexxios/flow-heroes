@@ -1,15 +1,17 @@
 import pathlib
 
-import pygame
 from pygame import Surface
 from pygame.sprite import Group
 import pymunk.pygame_util
 from pymunk import Space, Poly, Body
 
 from controls import Input
-from core.hero import HeroConfig, Hero
 from core.player import Player
-from core.tile import Tile
+
+from entities.enemies import BAT
+from entities.hero import Hero
+from entities.tile import Tile
+from entities.spells.instant import SUN_STRIKE
 
 from utils import load_tiled_map
 from constants import G
@@ -33,7 +35,7 @@ class Level:
         # Static objects group
         self.static = Group()
 
-        for x, y, surf in tiled_map.get_layer_by_name('ground').tiles():
+        for x, y, surf in tiled_map.get_layer_by_name("ground").tiles():
             tile = Tile.create_tile(x * 64, y * 64, surf, self.static)
             tile.body.body_type = Body.STATIC
             tile.body.position = tile.rect.center
@@ -44,11 +46,19 @@ class Level:
         self.dynamic = Group()
 
         hero_meta = tiled_map.get_object_by_name("hero")
-        hero = Hero(player.hero_config, (hero_meta.x * 2, hero_meta.y * 2), self.dynamic)
-        hero.body.position = hero.rect.center
+        hero = Hero(player.hero_config, self.dynamic)
+        hero.body.position = (hero_meta.x * 2, hero_meta.y * 2)
         shape = Poly.create_box(hero.body, hero.rect.size)
         shape.mass = 10
         self.space.add(hero.body, shape)
+
+        self.enemies = Group()
+        for enemy in tiled_map.get_layer_by_name("enemies"):
+            bat = BAT.create(self.dynamic, self.enemies)
+            bat.body.position = (enemy.x * 2, enemy.y * 2)
+            shape = Poly.create_box(bat.body, bat.rect.size)
+            shape.mass = 100000
+            self.space.add(bat.body, shape)
 
     def draw(self, surface: Surface):
         self.static.draw(surface)
@@ -56,4 +66,11 @@ class Level:
 
     def update(self, dt: int) -> None:
         self.space.step(dt / 1000)
-        self.dynamic.update(dt=dt, inputs=self.player.get_inputs())
+
+        player_inputs = self.player.get_inputs()
+
+        if Input.SUN_STRIKE in player_inputs:
+            SUN_STRIKE.create(self.dynamic, pos=self.enemies.sprites()[0].rect.midbottom)
+
+        self.dynamic.update(dt=dt, inputs=player_inputs)
+
