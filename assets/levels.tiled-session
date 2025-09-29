@@ -1,0 +1,71 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "levels/test_level.tmx",
+    "expandedProjectPaths": [
+        ".",
+        "levels"
+    ],
+    "file.lastUsedOpenFilter": "Все файлы (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "boxes.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "enemies.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "levels/test_level.tmx": {
+            "expandedGroupLayers": [
+                5
+            ],
+            "scale": 5.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 113.27272727272725,
+                "y": 184.72727272727275
+            }
+        },
+        "levels/test_level.tmx#plains": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "objects_animated.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "plains.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/jelly/PycharmProjects/flow-heroes/assets/gamekit/1 Huge mushroom",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "plains.tsx",
+        "boxes.tsx",
+        "objects_animated.tsx",
+        "levels/test_level.tmx",
+        "enemies.tsx"
+    ],
+    "project": "levels.tiled-project",
+    "recentFiles": [
+        "plains.tsx",
+        "boxes.tsx",
+        "objects_animated.tsx",
+        "enemies.tsx",
+        "levels/test_level.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
+}

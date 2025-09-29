@@ -1,10 +1,13 @@
 name: Build
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
-
+    inputs:
+      build_environment:
+        type: choice
+        options:
+          - development
+          - production
 jobs:
   build:
     runs-on: windows-latest
@@ -26,7 +29,7 @@ jobs:
 
     - name: Build EXE with PyInstaller
       run: |
-        pyinstaller --onefile --windowed --name "MyGame" src/main.py 
+        pyinstaller --onefile --windowed --name "MyGame" src/main.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4

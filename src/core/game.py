@@ -1,57 +1,78 @@
+import logging
+
 import pygame
-from threading import Thread
 
 from constants import FPS
-from core.background import Background
+
 from core.player import Player
-from core.spell import Spell
 
+from scenes import SceneManager
+from scenes.main_menu import MainMenuScene
+from scenes.game_scene import GameScene
 
-class Game(Thread):
+from utils import load_image
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s', filename="game.log", level=logging.DEBUG)
+
+class Game:
     def __init__(self, title: str, width: int, height: int):
         super().__init__()
+
+        # Setup
         self.title = title
         self.width = width
         self.height = height
-        self.scenes = []
-        self._running = False
 
     def run(self):
-        """Основной цикл в отдельном потоке."""
+        logger.info("Game launched")
+
         # pygame setup
         pygame.init()
-        screen = pygame.display.set_mode((self.width, self.height))
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.SCALED)
+        pygame.display.set_caption("Flow Heroes")
+        pygame.display.set_icon(load_image("assets/gamekit/2 512x512/2_2.png"))
+
+        # Initialize player
+        self.player = Player()
+
+        # UI setup
+        self.manager = SceneManager(self.screen)
+        main_menu_scene = MainMenuScene(self.manager)
+        game_scene = GameScene(self.manager, self.player)
+        self.manager.add_scene("main_menu", main_menu_scene)
+        self.manager.add_scene("game", game_scene)
+        self.manager.set_scene("main_menu")
+
+
+        # Run main loop
+        self._loop()
+
+
+    def _loop(self):
+        """Main game loop."""
         clock = pygame.time.Clock()
-        self._running = True
-
-        background = Background()
-
-        player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-        player = Player(pos=player_pos)
-
-        while self._running:
-            # poll for events
-            # pygame.QUIT event means the user clicked X to close your window
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self._running = False
-
-            # fill the screen with a color to wipe away anything from last frame
-            screen.fill("purple")
-
-            # pygame.draw.circle(screen, "red", player_pos, 40)
-            # screen.blit(fireball.animation[frames % 8], dest=player_pos)
-
-            background.draw(screen)
-            player.draw(screen)
-
-            # flip() the display to put your work on screen
-            pygame.display.flip()
-
-            # limits FPS to 60
-            # dt is delta time in seconds since last frame, used for framerate-
-            # independent physics.
+        running = True
+        while running:
             dt = clock.tick(FPS)
-            player.update(dt)
+
+            # poll for events
+            # pygame.QUIT event means the user clicked X to close the window
+            events = pygame.event.get(pygame.QUIT)
+            for event in events:
+                if event.type == pygame.QUIT:
+                    running = False
+                    continue
+
+            # handle events and update
+            self.manager.handle_events()
+            self.manager.update(dt)
+
+            # draw and flip() the display to put everything on screen
+            self.manager.draw()
+            surface = self.player.controls.get_surface()
+            if surface is not None:
+                self.screen.blit(pygame.transform.scale(surface, (self.width / 3, self.height / 3)))
+            pygame.display.flip()
 
         pygame.quit()

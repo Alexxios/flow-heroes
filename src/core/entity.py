@@ -1,29 +1,66 @@
-from abc import ABC
+import typing as tp
 
-from pygame import Vector2, Surface
-import pygame.image
+from pymunk import Body
+from pygame.sprite import Sprite
+
+from core.fsm import FiniteStateMachine, State
+
+class Entity(Sprite):
+    _fsm: tp.Optional[FiniteStateMachine]
+
+    def __init__(self, *groups, name='entity') -> None:
+        super().__init__(*groups)
+        self._name = name
+        self._flip = False
+        self._state_changed = False
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def pos(self) -> tuple[float, float]:
+        return self.rect.center
+
+    @property
+    def fsm(self) -> tp.Optional[FiniteStateMachine]:
+        return self._fsm
+
+    @property
+    def flip(self):
+        return self._flip
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self._fsm.update(*args, **kwargs)
+    
+    def kill(self):
+        super().kill()
+        self._fsm.state = State.DEAD
 
 
-class Entity(ABC):
-    name: str
-    pos: Vector2
+class PhysicalEntity(Entity):
 
-    def __init__(self, name: str = "", pos: Vector2 = Vector2(0, 0)) -> None:
-        self.name = name
-        self.pos = Vector2(pos)
+    def __init__(self, *groups, name='physical entity'):
+        super().__init__(*groups, name=name)
+        self.body = Body()
 
-class DrawableEntity(Entity):
+    def _physics_update(self, *args, **kwargs):
+        pass
 
-    def __init__(self, name: str = "", pos: Vector2 = Vector2(0, 0)):
-        super().__init__(name, pos)
+    def update(self, *args, **kwargs):
+        # Physics update
+        self._physics_update(*args, **kwargs)
 
-    def update(self, dt: int) -> None:
-        ...
+        # FSM update
+        super().update(*args, **kwargs)
 
-    def draw(self, parent: Surface) -> None:
-        ...
+        # Visual update
+        self.rect.center = self.body.position
 
-class LivingEntity(DrawableEntity):
+class LivingEntity(PhysicalEntity):
     _hp: int
     _atk: int
-    _def: int
+
+    def __init__(self, *groups, name='living entity'):
+        super().__init__(*groups, name=name)
