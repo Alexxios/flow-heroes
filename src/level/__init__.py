@@ -69,8 +69,5 @@ class Level:
 
         player_inputs = self.player.get_inputs()
 
-        if Input.SUN_STRIKE in player_inputs:
-            SUN_STRIKE.create(self.dynamic, pos=self.enemies.sprites()[0].rect.midbottom)
-
-        self.dynamic.update(dt=dt, inputs=player_inputs)
+        self.dynamic.update(dt=dt, inputs=player_inputs, dynamic=self.dynamic, enemies=self.enemies.sprites())
 

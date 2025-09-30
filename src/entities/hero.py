@@ -9,6 +9,7 @@ import pygame.event
 from controls import Input
 from core.entity import LivingEntity
 from core.fsm import State, FiniteStateMachine
+from entities.spells.instant import SUN_STRIKE
 from utils import load_image
 from utils.animation import Animation
 
@@ -31,6 +32,7 @@ class HeroConfig:
     hero_skin: Skin
     level: int = 1
     skills: tp.List[str] = field(default_factory=list)
+    skill_cooldown: int = 3
 
 class Hero(LivingEntity):
     class HeroState(State):
@@ -65,7 +67,7 @@ class Hero(LivingEntity):
         name = image_dir.split()[-1]
 
         super().__init__(*groups, name=name)
-
+        self.config = hero_config
         self._fsm = Hero.HeroFSM(self)
 
         self.surfaces = {
@@ -86,12 +88,13 @@ class Hero(LivingEntity):
         self.image = self.surfaces[Hero.HeroState.INIT]
         self.rect = self.image.get_rect()
         self.animation = None
+        self.cooldown = 0
 
     def _physics_update(self, *args, **kwargs):
         velocity_x, velocity_y = 0, self.body.velocity[1]
-        if Input.RIGHT in kwargs['inputs']:
+        if Input.RIGHT in kwargs.get('inputs', []):
             velocity_x = 128
-        elif Input.LEFT in kwargs['inputs']:
+        elif Input.LEFT in kwargs.get('inputs', []):
             velocity_x = -128
 
         # if Input.UP in kwargs['inputs'] and self._fsm.state != Hero.HeroState.JUMP:
@@ -105,8 +108,13 @@ class Hero(LivingEntity):
         old_state = self._fsm.state
         super().update(*args, **kwargs)
 
+        self.cooldown = max(self.cooldown - kwargs.get('dt', 0), 0)
+        if self.cooldown == 0 and Input.SUN_STRIKE in kwargs.get('inputs', []):
+            self.cast_spell(*args, **kwargs)
+            self.cooldown = self.config.skill_cooldown
+
         if old_state == self._fsm.state:
-            self.image = self.animation.update(kwargs['dt'])
+            self.image = self.animation.update(kwargs.get('dt', 0))
         else:
             self.animation = Animation(self.surfaces[self._fsm.state])
             self.image = self.animation.start()
@@ -144,6 +152,14 @@ class Hero(LivingEntity):
         if self.animation.loop > 0:
             return self.process()
         return Hero.HeroState.JUMP
+
+    def cast_spell(self, *args, **kwargs):
+        dynamic = kwargs.get('dynamic', None)
+        if not dynamic:
+            return
+        enemies = kwargs.get('enemies', [self])
+        SUN_STRIKE.create(dynamic, pos=enemies[0].rect.midbottom)
+
 
 class Apprentice(Hero):
     pass
