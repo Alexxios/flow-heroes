@@ -25,6 +25,9 @@ class KeyboardMouse(Controls):
     def _cancel(self, a, b):
         return a and (a ^ b), b and (a ^ b)
 
+    def update(self, *args, **kwargs):
+        pass
+
     def get_inputs(self) -> tp.List[Input]:
         inputs = []
 

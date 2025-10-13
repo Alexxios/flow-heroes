@@ -1,6 +1,10 @@
 import pygame
 from pygame.sprite import Group
 
+from controls import Input
+from controls.gestures.commands import *
+from core.player import Player
+
 from entities.background import Background
 from ui import Button, BalanceBar
 from ui.icons import RIGHT_ICON, STORE_ICON
@@ -11,8 +15,11 @@ from utils import load_image, load_font
 
 class MainMenuScene(Scene):
     """Main menu scene with buttons and balance display"""
-    def __init__(self, manager: SceneManager):
-        super().__init__(manager)
+    def __init__(self, manager: SceneManager, player: Player):
+        super().__init__(manager, player)
+        self.player.controls.update(
+            GesturePlay(), GesturePause(), GestureShop(), GestureExit()
+        )
         self.bg_color = (20, 20, 30)
         self.title_font = None
         self.button_font = None
@@ -105,8 +112,6 @@ class MainMenuScene(Scene):
         return icon
 
     def _on_play_click(self):
-        print("Play button clicked")
-        # In a complete implementation, you would transition to the game scene
         self.manager.set_scene("game")
 
     def _on_store_click(self):
@@ -130,6 +135,18 @@ class MainMenuScene(Scene):
         self.balance_font = None
         self.icons.clear()
         self.ui_elements.clear()
+
+    def update(self, dt: float) -> None:
+        """Update the main menu"""
+        super().update(dt)
+
+        inputs = self.player.get_inputs()
+        if Input.PLAY in inputs:
+            self._on_play_click()
+        elif Input.SHOP in inputs:
+            self._on_store_click()
+        elif Input.EXIT in inputs:
+            self._on_exit_click()
 
     def draw(self, surface: pygame.Surface) -> None:
         """Draw the main menu"""

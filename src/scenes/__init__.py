@@ -3,12 +3,15 @@ from typing import List, Dict, Optional
 
 import pygame
 
+from core.player import Player
+
 from ui import UIElement
 
 class Scene(abc.ABC):
     """Abstract base class for all game scenes"""
-    def __init__(self, manager: 'SceneManager'):
+    def __init__(self, manager: 'SceneManager', player: Player):
         self.manager = manager
+        self.player = player
         self.ui_elements: List[UIElement] = []
 
     @abc.abstractmethod

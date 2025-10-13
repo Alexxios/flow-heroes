@@ -8,11 +8,21 @@ class Input(Enum):
     RIGHT = auto()
     UP = auto()
     DOWN = auto()
+
+    PLAY = auto()
+    PAUSE = auto()
+    SHOP = auto()
+    EXIT = auto()
+
     ATTACK = auto()
     CAST = auto()
     SUN_STRIKE = auto()
 
 class Controls(ABC):
+    @abstractmethod
+    def update(self, *args, **kwargs):
+        ...
+
     @abstractmethod
     def get_inputs(self) -> tp.List[Input]:
         ...

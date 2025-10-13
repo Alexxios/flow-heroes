@@ -1,38 +1,18 @@
 import typing as tp
 
+import numpy as np
+import mediapipe as mp
 import pygame
 import pygame.camera
-import mediapipe as mp
+from pygame import Surface
 
 from controls import Controls, Input
-from controls.gestures.movement import *
-from controls.gestures.commands import *
-from controls.gestures.spells import GesturePray
 
 from constants import RECOGNITION_THRESHOLD, GESTURE_EVENT
 
 import logging
 logger = logging.getLogger(__name__)
 
-movement = [
-    GestureLeft(),
-    GestureRight(),
-    GestureUp(),
-    GestureDown()
-]
-
-commands = [
-    GesturePlay(),
-    GesturePause(),
-    GestureExit(),
-    GestureShop(),
-]
-
-spells = [
-    GesturePray()
-]
-
-gestures = movement + spells
 
 class Recognizer(Controls):
     def __init__(self):
@@ -57,11 +37,18 @@ class Recognizer(Controls):
             min_tracking_confidence=0.6
         )
 
+        self.gestures = []
         self._gesture_mapping = {
             'left': Input.LEFT,
             'right': Input.RIGHT,
             'up': Input.UP,
             'down': Input.DOWN,
+
+            'play': Input.PLAY,
+            'pause': Input.PAUSE,
+            'shop': Input.SHOP,
+            'exit': Input.EXIT,
+
             'pray': Input.SUN_STRIKE,
         }
 
@@ -69,6 +56,9 @@ class Recognizer(Controls):
     def __del__(self):
         self.cam.stop()
         pygame.camera.quit()
+
+    def update(self, *args, **kwargs):
+        self.gestures = args
 
     def get_inputs(self) -> tp.List[Input]:
         # Load image into surface
@@ -102,18 +92,18 @@ class Recognizer(Controls):
 
         return []
 
-    def get_surface(self):
+    def get_surface(self) -> Surface:
         return self.processed_surface
 
     def recognize(self, multi_hand_landmarks):
         best_score = [RECOGNITION_THRESHOLD] * len(multi_hand_landmarks)
         best_match = [None] * len(multi_hand_landmarks)
 
-        for gesture in gestures:
+        for gesture in self.gestures:
             scores = gesture.score(multi_hand_landmarks)
             for i, score in enumerate(scores):
                 if score > best_score[i]:
                     best_score[i] = score
                     best_match[i] = gesture.name
-
+        print(best_match)
         return set(best_match) - {None}

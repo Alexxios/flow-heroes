@@ -3,6 +3,10 @@ from typing import List
 import pygame
 from pygame.sprite import Group
 
+from controls.gestures.movement import *
+from controls.gestures.commands import GesturePause
+from controls.gestures.spells import *
+
 from core.player import Player
 from scenes import Scene
 
@@ -87,7 +91,12 @@ class PauseOverlay:
 class GameScene(Scene):
     """Game scene that handles gameplay, player, and UI elements"""
     def __init__(self, manager, player: Player, level = 1):
-        super().__init__(manager)
+        super().__init__(manager, player)
+        self.player.controls.update(
+            GestureLeft(), GestureRight(), GestureUp(), GestureDown(),
+            GesturePause(),
+            GesturePray()
+        )
         self.level = Level(level - 1, player)
 
         # Init groups of objects

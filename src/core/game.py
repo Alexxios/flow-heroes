@@ -38,7 +38,7 @@ class Game:
 
         # UI setup
         self.manager = SceneManager(self.screen)
-        main_menu_scene = MainMenuScene(self.manager)
+        main_menu_scene = MainMenuScene(self.manager, self.player)
         game_scene = GameScene(self.manager, self.player)
         self.manager.add_scene("main_menu", main_menu_scene)
         self.manager.add_scene("game", game_scene)
