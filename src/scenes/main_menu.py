@@ -17,9 +17,6 @@ class MainMenuScene(Scene):
     """Main menu scene with buttons and balance display"""
     def __init__(self, manager: SceneManager, player: Player):
         super().__init__(manager, player)
-        self.player.controls.update(
-            GesturePlay(), GesturePause(), GestureShop(), GestureExit()
-        )
         self.bg_color = (20, 20, 30)
         self.title_font = None
         self.button_font = None
@@ -29,6 +26,9 @@ class MainMenuScene(Scene):
     def setup(self) -> None:
         """Initialize main menu resources"""
         screen_width, screen_height = self.manager.screen.get_size()
+        self.player.controls.update(
+            GesturePlay(), GesturePause(), GestureShop(), GestureExit()
+        )
 
         # Init groups
         self.static = Group()

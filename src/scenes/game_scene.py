@@ -92,11 +92,6 @@ class GameScene(Scene):
     """Game scene that handles gameplay, player, and UI elements"""
     def __init__(self, manager, player: Player, level = 1):
         super().__init__(manager, player)
-        self.player.controls.update(
-            GestureLeft(), GestureRight(), GestureUp(), GestureDown(),
-            GesturePause(),
-            GesturePray()
-        )
         self.level = Level(level - 1, player)
 
         # Init groups of objects
@@ -118,6 +113,11 @@ class GameScene(Scene):
         self.level_display.setup()
         self.pause_overlay.setup()
         self.balance_display.update(self.manager.player_data["balance"])
+        self.player.controls.update(
+            GestureLeft(), GestureRight(), GestureUp(), GestureDown(),
+            GesturePause(),
+            GesturePray()
+        )
 
     def teardown(self) -> None:
         """Clean up scene resources"""
